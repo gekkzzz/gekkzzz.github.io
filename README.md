@@ -1,6 +1,6 @@
 # gekkzzz.github.io
 
-Personal portfolio and blog hub for gekkzzz — a web developer, video essayist, and general nerd based in Wales, UK. Hosted on GitHub Pages.
+Personal portfolio and blog hub for gekkzzz. Code is publically viewable, feel free to copy the code and/or give me suggestions!
 
 ## Purpose
 
@@ -20,12 +20,19 @@ This site serves as a central landing page: somewhere to find out who I am, see 
 - Displays my current time in the UK (`Europe/London`) and the visitor's local time, ticking every second.
 - Visitor timezone is detected via `ipwho.is` with a browser `Intl` fallback.
 - If a city is detected, the label updates to show the visitor's location.
+- Time and location providers are easy to tweak in `assets/js/site.js`.
 
 ### GitHub contribution calendar
 - Renders a custom contribution graph — no embedded image or third-party widget.
 - Data is fetched from the [github-contributions-api](https://github.com/jogruber/github-contributions-api) and rendered entirely in vanilla JS.
 - Shows Jan 1 of the current year through today. Future squares are invisible; the calendar grows day by day and resets automatically on each new year.
 - Refreshes at the top of every hour. All 7 weekday labels (Mon–Sun) are shown.
+- Chart behaviour is customisable (username, colour levels, and refresh interval), so the contribution view can be re-themed or reused.
+
+### Loader experience
+- A loading label appears above the progress bar while initial data/scripts finish loading.
+- If the site becomes ready partway through the bar animation, the remaining segment speeds up, completes to 100%, then swaps to a `DONE!` state.
+- The page is only revealed after the loader has fully faded out.
 
 ### Latest blog posts
 - Pulls the five most recent posts from the Substack RSS feed via `rss2json`.

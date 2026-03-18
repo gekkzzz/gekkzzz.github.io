@@ -6,7 +6,19 @@
   <title>About - gekkzzz</title>
   <link rel="stylesheet" href="../assets/css/site.css">
 </head>
-<body>
+<body class="is-site-loading">
+  <div class="page-loader" id="page-loader" aria-hidden="true">
+    <div class="loader-shell">
+      <p class="activity-update-note loader-note">Loading</p>
+      <div class="loader-slot">
+        <div class="loader" aria-hidden="true">
+          <span class="loader-fill" id="page-loader-fill"></span>
+        </div>
+        <h2 class="section-title loader-done">DONE!</h2>
+      </div>
+    </div>
+  </div>
+
   <div class="page-wrap">
     <a class="corner-avatar-link" href="../index.html">
       <img class="corner-avatar" src="../assets/images/avatar.png" alt="Avatar">
@@ -104,5 +116,6 @@
       </footer>
     </div>
   </div>
+  <script src="../assets/js/site.js"></script>
 </body>
 </html>

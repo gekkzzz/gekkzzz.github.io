@@ -18,6 +18,89 @@
   --contrib-4: #69a8f2;
 }
 
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--bg-color);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-shell {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  min-width: 220px;
+  padding: 0.9rem 1rem;
+}
+
+.loader-note {
+  margin: 0;
+}
+
+.loader-slot {
+  min-height: 1.35rem;
+  display: grid;
+  place-items: center;
+}
+
+.loader {
+  width: min(220px, 70vw);
+  height: 18px;
+  border: 1px solid #8f8f8f;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--heading-color) 10%, var(--bg-color));
+  overflow: hidden;
+}
+
+.loader-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--contrib-2), var(--contrib-4));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--contrib-4) 45%, transparent);
+}
+
+.page-loader.is-finishing .loader-fill {
+  transition: width 0.09s linear;
+}
+
+.loader-done {
+  margin: 0;
+  display: none;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.page-loader.is-complete .loader {
+  display: none;
+}
+
+.page-loader.is-complete .loader-done {
+  display: block;
+}
+
+body.is-site-loading {
+  overflow: hidden;
+}
+
+body.is-site-loading .page-wrap {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Base Styles & System Fonts */
 body {
   font-family: "JetBrains Mono", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -41,6 +124,7 @@ body {
   padding-top: 0.9rem;
   background-color: var(--bg-color);
   color: var(--text-color);
+  transition: opacity 0.25s ease;
 }
 
 .corner-avatar-link {
@@ -607,6 +691,41 @@ a:hover {
   line-height: 1.2;
 }
 
+.resources-section {
+  margin-top: 1.2rem;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.resources-heading {
+  margin: 0 0 0.45rem;
+  color: var(--meta-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.resources-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.resources-list li {
+  margin: 0 0 0.45rem;
+  font-size: 1em;
+  line-height: 1.45;
+}
+
+.resources-list li:last-child {
+  margin-bottom: 0;
+}
+
 /* Footer */
 footer {
   margin-top: 1.6rem;
@@ -683,6 +802,11 @@ footer {
 
   .post-list li {
     flex-direction: column;
+  }
+
+  .resources-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
   }
 
   .post-date {

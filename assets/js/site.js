@@ -5,6 +5,24 @@
   const yourTimeElement = document.getElementById('your-time');
   const yourTimezoneElement = document.getElementById('your-timezone');
   const yourTimeLabelElement = document.getElementById('your-time-label');
+  const pageLoaderElement = document.getElementById('page-loader');
+  const loaderFillElement = document.getElementById('page-loader-fill');
+  const loaderPreFinishMaxProgress = 92;
+  const loaderPreFinishDurationMs = 2600;
+  const maxLoaderDurationMs = 7000;
+  const loaderFadeDurationMs = 420;
+  const loaderDoneHoldDurationMs = 320;
+  const loaderFinishMinDurationMs = 220;
+  const loaderFinishMaxDurationMs = 650;
+  let hasHiddenLoader = false;
+  let hasStartedLoaderFinish = false;
+  let hasCompletedLoader = false;
+  let loaderProgress = 0;
+  let loaderTickHandle = 0;
+  let loaderStartTime = 0;
+  let loaderFinishStartTime = 0;
+  let loaderFinishStartProgress = 0;
+  let loaderFinishDurationMs = loaderFinishMaxDurationMs;
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
   let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -23,6 +41,120 @@
     timeZone: 'UTC'
   });
   const msPerDay = 24 * 60 * 60 * 1000;
+
+  function setLoaderProgress(nextProgress) {
+    loaderProgress = Math.max(0, Math.min(100, nextProgress));
+
+    if (loaderFillElement) {
+      loaderFillElement.style.width = `${loaderProgress.toFixed(2)}%`;
+    }
+  }
+
+  function stopLoaderTick() {
+    if (!loaderTickHandle) return;
+
+    window.cancelAnimationFrame(loaderTickHandle);
+    loaderTickHandle = 0;
+  }
+
+  function completePageLoader() {
+    if (!pageLoaderElement || hasCompletedLoader || hasHiddenLoader) return;
+
+    hasCompletedLoader = true;
+    setLoaderProgress(100);
+    pageLoaderElement.classList.add('is-complete');
+
+    window.setTimeout(hidePageLoader, loaderDoneHoldDurationMs);
+  }
+
+  function tickLoader(now) {
+    if (!pageLoaderElement || hasHiddenLoader) return;
+
+    if (!hasStartedLoaderFinish) {
+      const elapsed = Math.max(0, now - loaderStartTime);
+      const linearProgress = (elapsed / loaderPreFinishDurationMs) * loaderPreFinishMaxProgress;
+      const nextProgress = Math.min(loaderPreFinishMaxProgress, linearProgress);
+
+      if (nextProgress > loaderProgress) {
+        setLoaderProgress(nextProgress);
+      }
+    } else {
+      const elapsed = Math.max(0, now - loaderFinishStartTime);
+      const ratio = Math.min(1, elapsed / loaderFinishDurationMs);
+      const eased = 1 - Math.pow(1 - ratio, 3);
+      const nextProgress = loaderFinishStartProgress + ((100 - loaderFinishStartProgress) * eased);
+
+      setLoaderProgress(nextProgress);
+
+      if (ratio >= 1) {
+        completePageLoader();
+        return;
+      }
+    }
+
+    loaderTickHandle = window.requestAnimationFrame(tickLoader);
+  }
+
+  function startLoaderTick() {
+    if (!pageLoaderElement) return;
+
+    setLoaderProgress(0);
+    loaderStartTime = window.performance.now();
+    loaderTickHandle = window.requestAnimationFrame(tickLoader);
+  }
+
+  function hidePageLoader() {
+    if (!pageLoaderElement || hasHiddenLoader) return;
+
+    hasHiddenLoader = true;
+    stopLoaderTick();
+    pageLoaderElement.classList.add('is-hidden');
+
+    window.setTimeout(() => {
+      document.body.classList.remove('is-site-loading');
+
+      if (pageLoaderElement.parentElement) {
+        pageLoaderElement.parentElement.removeChild(pageLoaderElement);
+      }
+    }, loaderFadeDurationMs);
+  }
+
+  function startPageLoaderFinish() {
+    if (!pageLoaderElement || hasHiddenLoader || hasStartedLoaderFinish) return;
+
+    hasStartedLoaderFinish = true;
+    pageLoaderElement.classList.add('is-finishing');
+
+    loaderFinishStartProgress = loaderProgress;
+    loaderFinishStartTime = window.performance.now();
+
+    const remainingProgress = Math.max(0, 100 - loaderFinishStartProgress);
+    loaderFinishDurationMs = Math.min(
+      loaderFinishMaxDurationMs,
+      Math.max(loaderFinishMinDurationMs, remainingProgress * 8)
+    );
+
+    window.setTimeout(() => {
+      if (!hasCompletedLoader && !hasHiddenLoader) {
+        completePageLoader();
+      }
+    }, loaderFinishDurationMs + 180);
+  }
+
+  if (pageLoaderElement) {
+    startLoaderTick();
+
+    // Prevent the loader from getting stuck if onload does not fire as expected.
+    window.setTimeout(startPageLoaderFinish, maxLoaderDurationMs);
+
+    if (document.readyState === 'complete') {
+      startPageLoaderFinish();
+    } else {
+      window.addEventListener('load', startPageLoaderFinish, { once: true });
+    }
+  } else {
+    document.body.classList.remove('is-site-loading');
+  }
 
   function escapeHtml(str) {
     const d = document.createElement('div');
@@ -304,9 +436,12 @@
       : null;
 
     const city = payload.city || null;
-    const country = payload.country || payload.country_name || null;
+    const countryCode = payload.country_code
+      || (typeof payload.country === 'string' && payload.country.length === 2 ? payload.country : null)
+      || null;
+    const country = payload.country_name || payload.country || null;
 
-    return { timezone, city, country };
+    return { timezone, city, countryCode, country };
   }
 
   function renderTimeSection() {
@@ -324,14 +459,14 @@
   }
 
   async function detectUserTimeFromLocation() {
-    // Surface the browser-detected timezone immediately — no need to wait for the API.
+    // Surface immediate fallback copy while location APIs resolve.
     if (yourTimezoneElement) {
-      yourTimezoneElement.textContent = userTimezone;
+      yourTimezoneElement.textContent = 'Local device';
     }
     renderTimeSection();
 
     const locationEndpoints = [
-      'https://ipwho.is/?fields=success,city,country,timezone',
+      'https://ipwho.is/?fields=success,city,country,country_code,timezone',
       'https://ipinfo.io/json'
     ];
 
@@ -346,12 +481,13 @@
 
         if (isValidTimezone(data.timezone)) {
           userTimezone = data.timezone;
-          if (yourTimezoneElement) {
-            yourTimezoneElement.textContent = userTimezone;
-          }
         }
 
-        const locationBits = [data.city, data.country].filter(Boolean);
+        const locationBits = [data.city, data.countryCode || data.country].filter(Boolean);
+        if (yourTimezoneElement && locationBits.length > 0) {
+          yourTimezoneElement.textContent = locationBits.join(', ');
+        }
+
         if (yourTimeLabelElement && locationBits.length > 0) {
           yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
         }

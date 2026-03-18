@@ -6,7 +6,19 @@
   <title>gekkzzz - web developer, video essayist, nerd</title>
   <link rel="stylesheet" href="assets/css/site.css">
 </head>
-<body>
+<body class="is-site-loading">
+  <div class="page-loader" id="page-loader" aria-hidden="true">
+    <div class="loader-shell">
+      <p class="activity-update-note loader-note">Loading</p>
+      <div class="loader-slot">
+        <div class="loader" aria-hidden="true">
+          <span class="loader-fill" id="page-loader-fill"></span>
+        </div>
+        <h2 class="section-title loader-done">DONE!</h2>
+      </div>
+    </div>
+  </div>
+
   <div class="page-wrap">
     <a class="corner-avatar-link" href="#">
       <img class="corner-avatar" src="assets/images/avatar.png" alt="Avatar">
@@ -35,14 +47,12 @@
         <section class="time-section">
           <div class="time-grid">
             <article class="time-card">
-              <p class="time-label">my time</p>
+              <p class="time-label">My Time (Liverpool, GB)</p>
               <p class="time-value" id="my-time">--:--:--</p>
-              <p class="time-meta">Europe/London</p>
             </article>
             <article class="time-card">
               <p class="time-label" id="your-time-label">Your time</p>
               <p class="time-value" id="your-time">--:--:--</p>
-              <p class="time-meta" id="your-timezone">Detecting timezone...</p>
             </article>
           </div>
         </section>
@@ -63,6 +73,32 @@
           <ul class="post-list" id="post-list">
             <li class="post-empty">Loading&hellip;</li>
           </ul>
+        </section>
+
+        <section class="resources-section">
+          <div class="section-head">
+            <h2 class="section-title">Check These Out</h2>
+          </div>
+
+          <div class="resources-grid">
+            <article>
+              <p class="resources-heading">Causes</p>
+              <ul class="resources-list">
+                <li><a href="https://www.totalgiving.co.uk/charity-directory" target="_blank" rel="noopener">Charity Directory UK</a></li>
+                <li><a href="https://wearethechange.carrd.co" target="_blank" rel="noopener">We Are The Change</a></li>
+                <li><a href="https://www.un.org/en/global-issues" target="_blank" rel="noopener">UN Global Issues</a></li>
+              </ul>
+            </article>
+
+            <article>
+              <p class="resources-heading">Cool Stuff</p>
+              <ul class="resources-list">
+                <li><a href="https://stats.foldingathome.org" target="_blank" rel="noopener">Folding@Home</a></li>
+                <li><a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener">freeCodeCamp</a></li>
+                <li><a href="https://learn-anything.xyz" target="_blank" rel="noopener">Learn Anything</a></li>
+              </ul>
+            </article>
+          </div>
         </section>
       </main>
 
