@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="guestbook-api-url" content="">
   <title>gekkzzz - web developer, video essayist, nerd</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -33,7 +34,15 @@
           <ul class="post-list">
             <li>
               <span class="post-date">Mar 18</span>
-              <a href="#">New Website Launch! (link currently doesn't work)</a>
+              <a href="#">How to build a minimalist website</a>
+            </li>
+            <li>
+              <span class="post-date">Mar 10</span>
+              <a href="#">Understanding CSS Grid in 5 minutes</a>
+            </li>
+            <li>
+              <span class="post-date">Feb 28</span>
+              <a href="#">JavaScript Array methods you should know</a>
             </li>
           </ul>
         </section>
@@ -46,13 +55,15 @@
           <form id="guestbook-form" class="guestbook-form">
             <label>
               Name
-              <input id="guestbook-name" type="text" required maxlength="32" placeholder="Your name">
+              <input id="guestbook-name" type="text" required maxlength="32" autocomplete="name" placeholder="Your name">
             </label>
             <label>
               Message
-              <textarea id="guestbook-message" required maxlength="140" placeholder="Say something nice... (press Enter to submit)"></textarea>
+              <textarea id="guestbook-message" required maxlength="140" autocomplete="off" aria-describedby="guestbook-char-count" placeholder="Say something nice... (press Enter to submit)"></textarea>
             </label>
           </form>
+          <p id="guestbook-mode-note" class="guestbook-mode-note" aria-live="polite"></p>
+          <p id="guestbook-char-count" class="guestbook-char-count" aria-live="polite">0/140</p>
           <div id="guestbook-feedback" class="guestbook-feedback" aria-live="polite"></div>
           <div id="guestbook-list" class="guestbook-list"></div>
         </section>
@@ -64,101 +75,6 @@
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'guestbookEntries';
-    const VISITOR_ID_KEY = 'guestbookVisitorId';
-
-    const form = document.getElementById('guestbook-form');
-    const nameInput = document.getElementById('guestbook-name');
-    const messageInput = document.getElementById('guestbook-message');
-    const feedback = document.getElementById('guestbook-feedback');
-    const list = document.getElementById('guestbook-list');
-
-    function getVisitorId() {
-      let id = localStorage.getItem(VISITOR_ID_KEY);
-      if (!id) {
-        id = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-        localStorage.setItem(VISITOR_ID_KEY, id);
-      }
-      return id;
-    }
-
-    const visitorId = getVisitorId();
-
-    function loadEntries() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    }
-
-    function saveEntries(entries) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    }
-
-    function deleteEntry(index) {
-      const entries = loadEntries();
-      entries.splice(index, 1);
-      saveEntries(entries);
-      renderEntries();
-    }
-
-    function renderEntries() {
-      const entries = loadEntries();
-      list.innerHTML = entries.length === 0
-        ? '<p class="guestbook-empty">No messages yet. Be the first!</p>'
-        : entries.map((entry, index) => {
-            const canDelete = entry.ownerId === visitorId;
-            return `
-              <article class="guestbook-entry">
-                <div>
-                  ${canDelete ? `<button class="delete-btn" data-index="${index}" aria-label="Delete message"><svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 456 511.82"><path fill="#FD3B3B" d="M48.42 140.13h361.99c17.36 0 29.82 9.78 28.08 28.17l-30.73 317.1c-1.23 13.36-8.99 26.42-25.3 26.42H76.34c-13.63-.73-23.74-9.75-25.09-24.14L20.79 168.99c-1.74-18.38 9.75-28.86 27.63-28.86zM24.49 38.15h136.47V28.1c0-15.94 10.2-28.1 27.02-28.1h81.28c17.3 0 27.65 11.77 27.65 28.01v10.14h138.66c.57 0 1.11.07 1.68.13 10.23.93 18.15 9.02 18.69 19.22.03.79.06 1.39.06 2.17v42.76c0 5.99-4.73 10.89-10.62 11.19-.54 0-1.09.03-1.63.03H11.22c-5.92 0-10.77-4.6-11.19-10.38 0-.72-.03-1.47-.03-2.23v-39.5c0-10.93 4.21-20.71 16.82-23.02 2.53-.45 5.09-.37 7.67-.37zm83.78 208.38c-.51-10.17 8.21-18.83 19.53-19.31 11.31-.49 20.94 7.4 21.45 17.57l8.7 160.62c.51 10.18-8.22 18.84-19.53 19.32-11.32.48-20.94-7.4-21.46-17.57l-8.69-160.63zm201.7-1.74c.51-10.17 10.14-18.06 21.45-17.57 11.32.48 20.04 9.14 19.53 19.31l-8.66 160.63c-.52 10.17-10.14 18.05-21.46 17.57-11.31-.48-20.04-9.14-19.53-19.32l8.67-160.62zm-102.94.87c0-10.23 9.23-18.53 20.58-18.53 11.34 0 20.58 8.3 20.58 18.53v160.63c0 10.23-9.24 18.53-20.58 18.53-11.35 0-20.58-8.3-20.58-18.53V245.66z"/></svg></button>` : ''}
-                  <p class="gb-name">${entry.name}</p>
-                  <p class="gb-message">${entry.message}</p>
-                  <p class="gb-time">${new Date(entry.createdAt).toLocaleString()}</p>
-                </div>
-              </article>
-            `;
-          }).join('');
-
-      list.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          deleteEntry(Number(btn.dataset.index));
-        });
-      });
-    }
-
-    function submitGuestbook() {
-      const name = nameInput.value.trim();
-      const message = messageInput.value.trim();
-      if (!name || !message) {
-        feedback.textContent = 'Please enter both name and message.';
-        return;
-      }
-      const entries = loadEntries();
-      entries.unshift({
-        name,
-        message,
-        createdAt: Date.now(),
-        ownerId: visitorId
-      });
-      saveEntries(entries);
-      form.reset();
-      feedback.textContent = 'Thanks! Your message has been added.';
-      renderEntries();
-    }
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      submitGuestbook();
-    });
-
-    messageInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        submitGuestbook();
-      }
-    });
-
-    renderEntries();
-  </script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -3,11 +3,19 @@
 /* Define CSS Variables for Light/Dark Mode */
 :root {
   --bg-color: #ffffff;
-  --text-color: #111111;
+  --text-color: #171717;
+  --heading-color: #111111;
   --link-color: #0056b3;
   --link-hover: #003d82;
   --meta-color: #666666;
-  --border-color: #eaeaea;
+  --border-color: #dddddd;
+  --surface-color: #f7f9fb;
+  --entry-bg: #ffffff;
+  --entry-border: #d7d7d7;
+  --input-bg: #ffffff;
+  --input-border: #c4c4c4;
+  --feedback-success: #1f6f3f;
+  --feedback-error: #ad2b2b;
 }
 
 /* Automatically switch to Dark Mode if the user's OS is set to it */
@@ -15,10 +23,18 @@
   :root {
     --bg-color: #121212;
     --text-color: #e0e0e0;
-    --link-color: #66b3ff;
-    --link-hover: #99ccff;
+    --heading-color: #f4f4f4;
+    --link-color: #8ec5ff;
+    --link-hover: #b8dbff;
     --meta-color: #a0a0a0;
     --border-color: #333333;
+    --surface-color: #171717;
+    --entry-bg: #1d1d1d;
+    --entry-border: #343434;
+    --input-bg: #111111;
+    --input-border: #434343;
+    --feedback-success: #8fd9ac;
+    --feedback-error: #ff8f8f;
   }
 }
 
@@ -57,8 +73,8 @@ body {
   display: block;
   width: 44px;
   height: 44px;
-  border: 1px solid #ddd;
-  background: #fff;
+  border: 1px solid var(--border-color);
+  background: var(--entry-bg);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -84,12 +100,12 @@ body {
   gap: 1rem;
 }
 
-.hero h1, .site-title {
+.site-title {
   margin: 0;
   font-size: clamp(2rem, 7vw, 2.75rem);
   line-height: 1.1;
   letter-spacing: -0.025em;
-  color: #fff;
+  color: var(--heading-color);
 }
 
 .eyebrow {
@@ -103,7 +119,7 @@ body {
 .subtitle {
   margin: 0.4rem 0 0;
   max-width: 40rem;
-  color: #777;
+  color: var(--meta-color);
   font-size: 1.02rem;
   line-height: 1.55;
   font-weight: 400;
@@ -120,22 +136,7 @@ body {
 .hero-links a {
   font-size: 0.85rem;
   text-decoration: none;
-  color: #fff;
-  font-weight: 600;
-  border: 0;
-  background: transparent;
-  padding: 0.05rem 0.1rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-bottom: none;
-  transition: color 0.15s ease;
-  position: relative;
-}
-
-.hero-links a {
-  font-size: 0.85rem;
-  text-decoration: none;
-  color: #fff;
+  color: var(--heading-color);
   font-weight: 600;
   border: 0;
   background: transparent;
@@ -163,7 +164,7 @@ body {
 
 .hero-links a:hover::after,
 .hero-links a:focus-visible::after {
-  background: #fff;
+  background: currentColor;
   animation: blink-cursor 1.2s steps(1, start) infinite;
   animation-delay: 0.5s;
   animation-fill-mode: forwards;
@@ -176,16 +177,16 @@ body {
 }
 
 .hero-links a:hover {
-  color: #fff;
+  color: var(--link-color);
 }
 
 .guestbook-section {
   margin-top: 2rem;
   padding: 1rem;
-  border: none;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background: transparent;
-  color: #fff;
+  background: var(--surface-color);
+  color: var(--text-color);
 }
 
 .guestbook-header {
@@ -199,25 +200,12 @@ body {
 .guestbook-header h2 {
   margin: 0;
   font-size: 1.15rem;
-  color: #fff;
-}
-
-.guestbook-controls {
-  margin-top: 0.2rem;
-  margin-bottom: 0.6rem;
-  display: grid;
-  gap: 0.45rem;
-}
-
-.guestbook-controls label {
-  display: block;
-  font-size: 0.9rem;
-  color: #111;
+  color: var(--heading-color);
 }
 
 .guestbook-note {
   margin: 0.15rem 0 0.75rem;
-  color: #555;
+  color: var(--meta-color);
   font-size: 0.95rem;
 }
 
@@ -232,17 +220,25 @@ body {
   display: grid;
   gap: 0.2rem;
   font-size: 0.9rem;
-  color: #111;
+  color: var(--text-color);
 }
 
 .guestbook-form input,
 .guestbook-form textarea {
   width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
   padding: 0.4rem 0.45rem;
   font-size: 0.9rem;
   font-family: inherit;
+}
+
+.guestbook-form input:focus-visible,
+.guestbook-form textarea:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 1px;
 }
 
 .guestbook-form textarea {
@@ -250,84 +246,107 @@ body {
   resize: vertical;
 }
 
-.submit-btn {
-  width: fit-content;
-  border: 0;
-  background: #0056b3;
-  color: #fff;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
+.guestbook-char-count {
+  margin: -0.1rem 0 0.65rem;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--meta-color);
+}
+
+.guestbook-mode-note {
+  margin: -0.1rem 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--meta-color);
+}
+
+.guestbook-mode-note:empty {
+  display: none;
+}
+
+.guestbook-char-count[data-state="limit"] {
+  color: var(--feedback-error);
 }
 
 .guestbook-feedback {
   min-height: 1.4rem;
   margin-bottom: 0.6rem;
   font-size: 0.88rem;
-  color: #2a2a2a;
+  color: var(--meta-color);
+}
+
+.guestbook-feedback[data-state="success"] {
+  color: var(--feedback-success);
+}
+
+.guestbook-feedback[data-state="error"] {
+  color: var(--feedback-error);
 }
 
 .guestbook-list {
   display: grid;
   gap: 0.4rem;
+  max-height: 20rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+  scrollbar-gutter: stable;
 }
 
 .guestbook-empty {
   margin: 0;
-  color: #666;
+  color: var(--meta-color);
   font-size: 0.9rem;
 }
 
 .guestbook-entry {
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--entry-border);
   padding: 0.55rem;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--entry-bg);
   position: relative;
 }
 
-.guestbook-entry .delete-btn {
+.delete-btn {
   position: absolute;
   top: 0.2rem;
   right: 0.2rem;
   border: 0;
-  background: none;
+  background: transparent;
+  color: var(--meta-color);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
-  width: 20px;
-  height: 20px;
-  padding: 0;
+  padding: 0.25rem;
+  border-radius: 6px;
 }
 
-.guestbook-entry .delete-btn svg {
-  width: 20px;
-  height: 20px;
-  display: block;
-}
-
-.guestbook-entry .delete-btn:hover {
-  opacity: 0.85;
+.delete-btn:hover,
+.delete-btn:focus-visible {
+  color: var(--feedback-error);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .gb-name {
   margin: 0;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading-color);
 }
 
 .gb-message {
   margin: 0.2rem 0;
-  color: #f1f1f1;
+  color: var(--text-color);
   max-width: 65ch;
+  white-space: pre-wrap;
 }
 
 .gb-time {
   margin: 0;
   font-size: 0.76rem;
-  color: #ccc;
+  color: var(--meta-color);
 }
 
 
@@ -336,7 +355,7 @@ h1, h2, h3 {
   line-height: 1.2;
   margin-top: 2rem;
   margin-bottom: 0.8rem;
-  color: #111;
+  color: var(--heading-color);
 }
 
 p {
@@ -344,9 +363,9 @@ p {
 }
 
 a {
-  color: #111;
+  color: var(--link-color);
   text-decoration: none;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--link-color) 35%, transparent);
   transition: border-color 0.15s ease 0s, color 0.15s ease 0s;
 }
 
@@ -356,8 +375,8 @@ a {
 }
 
 .post-list li a:hover {
-  color: #003d82;
-  border-color: #003d82;
+  color: var(--link-hover);
+  border-color: var(--link-hover);
 }
 
 a:hover {
@@ -400,7 +419,7 @@ a:hover {
 footer {
   margin-top: 2.2rem;
   padding-top: 1rem;
-  border-top: 1px solid #e7e7e7;
+  border-top: 1px solid var(--border-color);
   font-size: 0.85rem;
   color: var(--meta-color);
   text-align: left;
@@ -412,12 +431,25 @@ footer {
     padding: 1rem;
   }
 
+  .hero {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
   .hero h1 {
     font-size: clamp(1.8rem, 12vw, 2.4rem);
   }
 
   .hero-links {
-    padding-top: 0.4rem;
+    padding-top: 0.25rem;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .hero-links a::after {
+    display: none;
   }
 }
 
@@ -440,7 +472,7 @@ footer {
   }
 
   .hero-links {
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .post-list li {
