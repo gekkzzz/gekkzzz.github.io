@@ -7,8 +7,8 @@
   const yourTimeLabelElement = document.getElementById('your-time-label');
   const pageLoaderElement = document.getElementById('page-loader');
   const loaderElement = pageLoaderElement ? pageLoaderElement.querySelector('.loader') : null;
-  const loaderStorageKey = 'gekkzzz.site-loader.shown';
-  const minLoaderDurationMs = 2600;
+  const loaderPersistenceKey = 'gekkzzz.site-loader.shown';
+  const minLoaderDurationMs = 3000;
   const maxLoaderDurationMs = 7000;
   const loaderFadeDurationMs = 420;
   const loaderFullHoldDurationMs = 1000;
@@ -38,17 +38,25 @@
   });
   const msPerDay = 24 * 60 * 60 * 1000;
 
-  function hasShownLoaderInStorage() {
+  function clearLegacyLoaderStorage() {
     try {
-      return window.localStorage.getItem(loaderStorageKey) === '1';
+      window.localStorage.removeItem(loaderPersistenceKey);
+    } catch {
+      // Ignore storage failures and keep loader functional.
+    }
+  }
+
+  function hasShownLoaderInSession() {
+    try {
+      return window.sessionStorage.getItem(loaderPersistenceKey) === '1';
     } catch {
       return false;
     }
   }
 
-  function markLoaderShownInStorage() {
+  function markLoaderShownInSession() {
     try {
-      window.localStorage.setItem(loaderStorageKey, '1');
+      window.sessionStorage.setItem(loaderPersistenceKey, '1');
     } catch {
       // Ignore storage failures and keep loader functional.
     }
@@ -120,10 +128,11 @@
     window.setTimeout(startPageLoaderFinish, remaining);
   }
 
-  const shouldRunPageLoader = Boolean(pageLoaderElement) && !hasShownLoaderInStorage();
+  clearLegacyLoaderStorage();
+  const shouldRunPageLoader = Boolean(pageLoaderElement) && !hasShownLoaderInSession();
 
   if (shouldRunPageLoader) {
-    markLoaderShownInStorage();
+    markLoaderShownInSession();
 
     // Prevent the loader from getting stuck if onload does not fire as expected.
     window.setTimeout(startPageLoaderFinish, maxLoaderDurationMs);
