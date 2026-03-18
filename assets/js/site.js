@@ -62,6 +62,27 @@
     }
   }
 
+  function getNavigationType() {
+    try {
+      const entries = window.performance && window.performance.getEntriesByType
+        ? window.performance.getEntriesByType('navigation')
+        : [];
+
+      if (entries.length > 0 && typeof entries[0].type === 'string') {
+        return entries[0].type;
+      }
+    } catch {
+      // Fall through to legacy API.
+    }
+
+    const legacyNavigation = window.performance && window.performance.navigation;
+    if (legacyNavigation && typeof legacyNavigation.type === 'number') {
+      return legacyNavigation.type === 1 ? 'reload' : 'navigate';
+    }
+
+    return 'navigate';
+  }
+
   function disablePageLoaderImmediately() {
     if (pageLoaderElement && pageLoaderElement.parentElement) {
       pageLoaderElement.parentElement.removeChild(pageLoaderElement);
@@ -129,7 +150,9 @@
   }
 
   clearLegacyLoaderStorage();
-  const shouldRunPageLoader = Boolean(pageLoaderElement) && !hasShownLoaderInSession();
+  const isReloadNavigation = getNavigationType() === 'reload';
+  const shouldRunPageLoader = Boolean(pageLoaderElement)
+    && (isReloadNavigation || !hasShownLoaderInSession());
 
   if (shouldRunPageLoader) {
     markLoaderShownInSession();
