@@ -285,6 +285,30 @@
     }
   }
 
+  function isValidTimezone(timezone) {
+    if (!timezone) return false;
+
+    try {
+      new Intl.DateTimeFormat('en-GB', { timeZone: timezone }).format(new Date());
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function normalizeLocationPayload(payload) {
+    if (!payload || payload.success === false) return null;
+
+    const timezone = payload.timezone
+      ? (typeof payload.timezone === 'string' ? payload.timezone : payload.timezone.id)
+      : null;
+
+    const city = payload.city || null;
+    const country = payload.country || payload.country_name || null;
+
+    return { timezone, city, country };
+  }
+
   function renderTimeSection() {
     if (!myTimeElement && !yourTimeElement) return;
 
@@ -306,32 +330,41 @@
     }
     renderTimeSection();
 
-    try {
-      const response = await fetch('https://ipwho.is/', { cache: 'no-store' });
-      if (!response.ok) throw new Error('location fetch failed');
+    const locationEndpoints = [
+      'https://ipwho.is/?fields=success,city,country,timezone',
+      'https://ipinfo.io/json'
+    ];
 
-      const data = await response.json();
-      if (!data.success) return;
+    for (const endpoint of locationEndpoints) {
+      try {
+        const response = await fetch(endpoint, { cache: 'no-store' });
+        if (!response.ok) continue;
 
-      // ipwho.is returns timezone as either a plain string or an object with an id field.
-      const tzId = data.timezone
-        ? (typeof data.timezone === 'string' ? data.timezone : data.timezone.id)
-        : null;
+        const payload = await response.json();
+        const data = normalizeLocationPayload(payload);
+        if (!data) continue;
 
-      if (tzId) {
-        userTimezone = tzId;
-        if (yourTimezoneElement) {
-          yourTimezoneElement.textContent = userTimezone;
+        if (isValidTimezone(data.timezone)) {
+          userTimezone = data.timezone;
+          if (yourTimezoneElement) {
+            yourTimezoneElement.textContent = userTimezone;
+          }
         }
-      }
 
-      const locationBits = [data.city, data.country].filter(Boolean);
-      if (yourTimeLabelElement && locationBits.length > 0) {
-        yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
+        const locationBits = [data.city, data.country].filter(Boolean);
+        if (yourTimeLabelElement && locationBits.length > 0) {
+          yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
+        }
+
+        if (isValidTimezone(data.timezone) || locationBits.length > 0) {
+          break;
+        }
+      } catch {
+        // Try the next provider if this one fails.
       }
-    } catch {
-      // Browser timezone already applied above — nothing more to do.
     }
+
+    renderTimeSection();
   }
 
   if (myTimeElement || yourTimeElement) {
