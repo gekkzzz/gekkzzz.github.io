@@ -77,10 +77,28 @@
 
     const legacyNavigation = window.performance && window.performance.navigation;
     if (legacyNavigation && typeof legacyNavigation.type === 'number') {
-      return legacyNavigation.type === 1 ? 'reload' : 'navigate';
+      if (legacyNavigation.type === 1) return 'reload';
+      if (legacyNavigation.type === 2) return 'back_forward';
+      return 'navigate';
     }
 
     return 'navigate';
+  }
+
+  function isSamePageReferrer() {
+    if (!document.referrer) return false;
+
+    try {
+      const currentUrl = new URL(window.location.href);
+      const referrerUrl = new URL(document.referrer);
+
+      currentUrl.hash = '';
+      referrerUrl.hash = '';
+
+      return currentUrl.href === referrerUrl.href;
+    } catch {
+      return false;
+    }
   }
 
   function disablePageLoaderImmediately() {
@@ -150,9 +168,12 @@
   }
 
   clearLegacyLoaderStorage();
-  const isReloadNavigation = getNavigationType() === 'reload';
+  const navigationType = getNavigationType();
+  const isReloadNavigation = navigationType === 'reload';
+  const isBackForwardNavigation = navigationType === 'back_forward';
+  const isSamePageRefresh = isSamePageReferrer();
   const shouldRunPageLoader = Boolean(pageLoaderElement)
-    && (isReloadNavigation || !hasShownLoaderInSession());
+    && (isReloadNavigation || isBackForwardNavigation || isSamePageRefresh || !hasShownLoaderInSession());
 
   if (shouldRunPageLoader) {
     markLoaderShownInSession();
