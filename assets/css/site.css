@@ -1,41 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-/* Define CSS Variables for Light/Dark Mode */
+/* CSS Variables */
 :root {
-  --bg-color: #ffffff;
-  --text-color: #171717;
-  --heading-color: #111111;
-  --link-color: #0056b3;
-  --link-hover: #003d82;
-  --meta-color: #666666;
-  --border-color: #dddddd;
-  --status-color: #22c55e;
-  --status-glow: rgba(34, 197, 94, 0.58);
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --heading-color: #f4f4f4;
+  --link-color: #8ec5ff;
+  --link-hover: #b8dbff;
+  --meta-color: #a0a0a0;
+  --border-color: #333333;
+  --status-color: #4ade80;
+  --status-glow: rgba(74, 222, 128, 0.6);
   --contrib-empty: var(--meta-color);
-  --contrib-1: #b6d1f6;
-  --contrib-2: #7eaee8;
-  --contrib-3: #4d87d7;
-  --contrib-4: #245eb3;
-}
-
-/* Automatically switch to Dark Mode if the user's OS is set to it */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #121212;
-    --text-color: #e0e0e0;
-    --heading-color: #f4f4f4;
-    --link-color: #8ec5ff;
-    --link-hover: #b8dbff;
-    --meta-color: #a0a0a0;
-    --border-color: #333333;
-    --status-color: #4ade80;
-    --status-glow: rgba(74, 222, 128, 0.6);
-    --contrib-empty: var(--meta-color);
-    --contrib-1: #244667;
-    --contrib-2: #2d5f91;
-    --contrib-3: #3a82c7;
-    --contrib-4: #69a8f2;
-  }
+  --contrib-1: #244667;
+  --contrib-2: #2d5f91;
+  --contrib-3: #3a82c7;
+  --contrib-4: #69a8f2;
 }
 
 /* Base Styles & System Fonts */

@@ -31,9 +31,6 @@ This site serves as a central landing page: somewhere to find out who I am, see 
 - Pulls the five most recent posts from the Substack RSS feed via `rss2json`.
 - Falls back gracefully if the feed is unavailable.
 
-### Dark mode
-- Fully supports `prefers-color-scheme: dark` via CSS custom properties — no JavaScript required.
-
 ### Blinking cursor on nav links
 - Hovering a nav link triggers a blinking text-cursor animation next to it.
 
