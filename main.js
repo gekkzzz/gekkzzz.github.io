@@ -3,6 +3,8 @@
   const calendar = document.getElementById('github-calendar');
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
+  const activityRefreshIntervalMs = 60 * 60 * 1000;
+  let isRefreshingActivity = false;
   const monthFormatter = new Intl.DateTimeFormat('en-US', {
     month: 'short',
     timeZone: 'UTC'
@@ -68,14 +70,20 @@
     return { start, end };
   }
 
-  async function fetchActivityDays(username, start, end) {
+  async function fetchActivityDays(username, start, end, hourBucket) {
     const years = Array.from(new Set([
       start.getUTCFullYear(),
       end.getUTCFullYear()
     ]));
 
     const payloads = await Promise.all(years.map(async (year) => {
-      const response = await fetch(`${activityApiBase}${encodeURIComponent(username)}?y=${year}`);
+      const params = new URLSearchParams({
+        y: String(year),
+        cb: String(hourBucket)
+      });
+      const response = await fetch(`${activityApiBase}${encodeURIComponent(username)}?${params.toString()}`, {
+        cache: 'no-store'
+      });
       if (!response.ok) {
         throw new Error('activity fetch failed');
       }
@@ -244,14 +252,26 @@
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
-  if (calendar) {
+  async function refreshActivityCalendar() {
+    if (!calendar || isRefreshingActivity) return;
+
+    isRefreshingActivity = true;
+
     try {
       const { start, end } = getActivityRange();
-      const activityDays = await fetchActivityDays(activityUsername, start, end);
+      const hourBucket = Math.floor(Date.now() / activityRefreshIntervalMs);
+      const activityDays = await fetchActivityDays(activityUsername, start, end, hourBucket);
       renderActivityCalendar(calendar, activityDays, start, end);
     } catch {
       calendar.textContent = 'Activity unavailable right now.';
+    } finally {
+      isRefreshingActivity = false;
     }
+  }
+
+  if (calendar) {
+    await refreshActivityCalendar();
+    window.setInterval(refreshActivityCalendar, activityRefreshIntervalMs);
   }
 
   if (!list) return;
