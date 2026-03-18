@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gekkzzz - web developer, video essayist, nerd</title>
+  <link rel="stylesheet" href="https://unpkg.com/github-calendar@latest/dist/github-calendar-responsive.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,14 +38,7 @@
             <h2>GitHub Contributions</h2>
             <a class="section-link" href="https://github.com/gekkzzz" target="_blank" rel="noopener">View GitHub</a>
           </div>
-          <a class="contribution-frame" href="https://github.com/gekkzzz" target="_blank" rel="noopener">
-            <img
-              class="contribution-chart"
-              src="https://ghchart.rshah.org/2563eb/gekkzzz"
-              alt="GitHub contribution chart for gekkzzz"
-              loading="lazy"
-            >
-          </a>
+          <div id="github-calendar" class="calendar contribution-frame">Loading contribution chart&hellip;</div>
         </section>
 
         <section class="posts">
@@ -60,6 +54,7 @@
       </footer>
     </div>
   </div>
+  <script src="https://unpkg.com/github-calendar@latest/dist/github-calendar.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

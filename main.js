@@ -1,5 +1,20 @@
 (async function () {
   const list = document.getElementById('post-list');
+  const calendar = document.getElementById('github-calendar');
+
+  if (calendar && typeof window.GitHubCalendar === 'function') {
+    window.GitHubCalendar(calendar, 'gekkzzz', {
+      responsive: true,
+      global_stats: false,
+      tooltips: false,
+      summary_text: ''
+    }).catch(() => {
+      calendar.textContent = 'Contribution chart unavailable right now.';
+    });
+  } else if (calendar) {
+    calendar.textContent = 'Contribution chart unavailable right now.';
+  }
+
   if (!list) return;
 
   function escapeHtml(str) {
