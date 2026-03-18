@@ -300,30 +300,37 @@
   }
 
   async function detectUserTimeFromLocation() {
-    if (!yourTimezoneElement && !yourTimeLabelElement) return;
+    // Surface the browser-detected timezone immediately — no need to wait for the API.
+    if (yourTimezoneElement) {
+      yourTimezoneElement.textContent = userTimezone;
+    }
+    renderTimeSection();
 
     try {
       const response = await fetch('https://ipwho.is/', { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error('location fetch failed');
-      }
+      if (!response.ok) throw new Error('location fetch failed');
 
       const data = await response.json();
-      if (data.success && data.timezone && data.timezone.id) {
-        userTimezone = data.timezone.id;
+      if (!data.success) return;
 
-        const locationBits = [data.city, data.country].filter(Boolean);
-        if (yourTimeLabelElement && locationBits.length > 0) {
-          yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
+      // ipwho.is returns timezone as either a plain string or an object with an id field.
+      const tzId = data.timezone
+        ? (typeof data.timezone === 'string' ? data.timezone : data.timezone.id)
+        : null;
+
+      if (tzId) {
+        userTimezone = tzId;
+        if (yourTimezoneElement) {
+          yourTimezoneElement.textContent = userTimezone;
         }
       }
-    } catch {
-      // Keep browser timezone fallback if location lookup fails.
-    } finally {
-      if (yourTimezoneElement) {
-        yourTimezoneElement.textContent = userTimezone;
+
+      const locationBits = [data.city, data.country].filter(Boolean);
+      if (yourTimeLabelElement && locationBits.length > 0) {
+        yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
       }
-      renderTimeSection();
+    } catch {
+      // Browser timezone already applied above — nothing more to do.
     }
   }
 
