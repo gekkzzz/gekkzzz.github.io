@@ -261,8 +261,8 @@ a {
 }
 
 .post-empty {
-  color: var(--meta-color);
-  font-size: 1rem;
+  color: var(--text-color);
+  font-size: inherit;
   list-style: none;
 }
 

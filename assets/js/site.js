@@ -372,7 +372,7 @@
     const data = await res.json();
 
     if (data.status !== 'ok' || !Array.isArray(data.items) || data.items.length === 0) {
-      list.innerHTML = '<li class="post-empty">Nothing to see yet!</li>';
+      list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
       return;
     }
 
@@ -383,6 +383,6 @@
       </li>
     `).join('');
   } catch {
-    list.innerHTML = '<li class="post-empty">Nothing to see yet!</li>';
+    list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
   }
 })();
