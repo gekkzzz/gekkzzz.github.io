@@ -261,8 +261,11 @@ a {
 }
 
 .post-empty {
+  display: block;
   color: var(--text-color);
   font-size: inherit;
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
   list-style: none;
 }
 
