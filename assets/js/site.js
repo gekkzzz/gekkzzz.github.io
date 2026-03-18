@@ -7,7 +7,7 @@
   const yourTimeLabelElement = document.getElementById('your-time-label');
   const pageLoaderElement = document.getElementById('page-loader');
   const loaderElement = pageLoaderElement ? pageLoaderElement.querySelector('.loader') : null;
-  const loaderPersistenceKey = 'gekkzzz.site-loader.shown';
+  const loaderSkipNavigationKey = 'gekkzzz.site-loader.skip-next-nav';
   const minLoaderDurationMs = 3000;
   const maxLoaderDurationMs = 7000;
   const loaderFadeDurationMs = 420;
@@ -38,67 +38,64 @@
   });
   const msPerDay = 24 * 60 * 60 * 1000;
 
-  function clearLegacyLoaderStorage() {
+  function setLoaderSkipForNextNavigation() {
     try {
-      window.localStorage.removeItem(loaderPersistenceKey);
+      window.sessionStorage.setItem(loaderSkipNavigationKey, '1');
     } catch {
       // Ignore storage failures and keep loader functional.
     }
   }
 
-  function hasShownLoaderInSession() {
+  function consumeLoaderSkipForNavigation() {
     try {
-      return window.sessionStorage.getItem(loaderPersistenceKey) === '1';
-    } catch {
-      return false;
-    }
-  }
+      const shouldSkip = window.sessionStorage.getItem(loaderSkipNavigationKey) === '1';
 
-  function markLoaderShownInSession() {
-    try {
-      window.sessionStorage.setItem(loaderPersistenceKey, '1');
-    } catch {
-      // Ignore storage failures and keep loader functional.
-    }
-  }
-
-  function getNavigationType() {
-    try {
-      const entries = window.performance && window.performance.getEntriesByType
-        ? window.performance.getEntriesByType('navigation')
-        : [];
-
-      if (entries.length > 0 && typeof entries[0].type === 'string') {
-        return entries[0].type;
+      if (shouldSkip) {
+        window.sessionStorage.removeItem(loaderSkipNavigationKey);
       }
-    } catch {
-      // Fall through to legacy API.
-    }
 
-    const legacyNavigation = window.performance && window.performance.navigation;
-    if (legacyNavigation && typeof legacyNavigation.type === 'number') {
-      if (legacyNavigation.type === 1) return 'reload';
-      if (legacyNavigation.type === 2) return 'back_forward';
-      return 'navigate';
-    }
-
-    return 'navigate';
-  }
-
-  function isSamePageReferrer() {
-    if (!document.referrer) return false;
-
-    try {
-      const currentUrl = new URL(window.location.href);
-      const referrerUrl = new URL(document.referrer);
-
-      currentUrl.hash = '';
-      referrerUrl.hash = '';
-
-      return currentUrl.href === referrerUrl.href;
+      return shouldSkip;
     } catch {
       return false;
     }
+  }
+
+  function markInternalPageNavigations() {
+    const anchors = document.querySelectorAll('a[href]');
+    if (!anchors.length) return;
+
+    const currentUrl = new URL(window.location.href);
+
+    anchors.forEach((anchor) => {
+      anchor.addEventListener('click', (event) => {
+        if (event.defaultPrevented) return;
+        if (event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (anchor.target && anchor.target.toLowerCase() !== '_self') return;
+        if (anchor.hasAttribute('download')) return;
+
+        const rawHref = anchor.getAttribute('href');
+        if (!rawHref || rawHref.startsWith('#')) return;
+
+        let destination;
+
+        try {
+          destination = new URL(anchor.href, window.location.href);
+        } catch {
+          return;
+        }
+
+        if (!/^https?:$/.test(destination.protocol)) return;
+        if (destination.origin !== currentUrl.origin) return;
+
+        const isSameDocument = destination.pathname === currentUrl.pathname
+          && destination.search === currentUrl.search;
+
+        if (isSameDocument) return;
+
+        setLoaderSkipForNextNavigation();
+      });
+    });
   }
 
   function disablePageLoaderImmediately() {
@@ -167,16 +164,11 @@
     window.setTimeout(startPageLoaderFinish, remaining);
   }
 
-  clearLegacyLoaderStorage();
-  const navigationType = getNavigationType();
-  const isReloadNavigation = navigationType === 'reload';
-  const isBackForwardNavigation = navigationType === 'back_forward';
-  const isSamePageRefresh = isSamePageReferrer();
-  const shouldRunPageLoader = Boolean(pageLoaderElement)
-    && (isReloadNavigation || isBackForwardNavigation || isSamePageRefresh || !hasShownLoaderInSession());
+  markInternalPageNavigations();
+  const shouldSkipLoaderForInternalNavigation = consumeLoaderSkipForNavigation();
+  const shouldRunPageLoader = Boolean(pageLoaderElement) && !shouldSkipLoaderForInternalNavigation;
 
   if (shouldRunPageLoader) {
-    markLoaderShownInSession();
 
     // Prevent the loader from getting stuck if onload does not fire as expected.
     window.setTimeout(startPageLoaderFinish, maxLoaderDurationMs);
