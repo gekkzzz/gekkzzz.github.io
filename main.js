@@ -1,6 +1,13 @@
 (async function () {
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
+  const myTimeElement = document.getElementById('my-time');
+  const yourTimeElement = document.getElementById('your-time');
+  const yourTimezoneElement = document.getElementById('your-timezone');
+  const yourTimeLabelElement = document.getElementById('your-time-label');
+  const ukTimezone = 'Europe/London';
+  const timeTickIntervalMs = 1000;
+  let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
   const activityRefreshIntervalMs = 60 * 60 * 1000;
@@ -252,6 +259,73 @@
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
+  function formatClockTime(date, timezone) {
+    try {
+      return new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: timezone
+      }).format(date);
+    } catch {
+      return new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).format(date);
+    }
+  }
+
+  function renderTimeSection() {
+    if (!myTimeElement && !yourTimeElement) return;
+
+    const now = new Date();
+
+    if (myTimeElement) {
+      myTimeElement.textContent = formatClockTime(now, ukTimezone);
+    }
+
+    if (yourTimeElement) {
+      yourTimeElement.textContent = formatClockTime(now, userTimezone);
+    }
+  }
+
+  async function detectUserTimeFromLocation() {
+    if (!yourTimezoneElement && !yourTimeLabelElement) return;
+
+    try {
+      const response = await fetch('https://ipwho.is/', { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error('location fetch failed');
+      }
+
+      const data = await response.json();
+      if (data.success && data.timezone && data.timezone.id) {
+        userTimezone = data.timezone.id;
+
+        const locationBits = [data.city, data.country].filter(Boolean);
+        if (yourTimeLabelElement && locationBits.length > 0) {
+          yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
+        }
+      }
+    } catch {
+      // Keep browser timezone fallback if location lookup fails.
+    } finally {
+      if (yourTimezoneElement) {
+        yourTimezoneElement.textContent = userTimezone;
+      }
+      renderTimeSection();
+    }
+  }
+
+  if (myTimeElement || yourTimeElement) {
+    renderTimeSection();
+    window.setInterval(renderTimeSection, timeTickIntervalMs);
+    await detectUserTimeFromLocation();
+  }
+
   async function refreshActivityCalendar() {
     if (!calendar || isRefreshingActivity) return;
 
@@ -269,9 +343,23 @@
     }
   }
 
+  function scheduleActivityRefreshOnTheHour() {
+    const now = new Date();
+    const nextHour = new Date(now);
+    nextHour.setMinutes(0, 0, 0);
+    nextHour.setHours(nextHour.getHours() + 1);
+
+    const delay = Math.max(1000, nextHour.getTime() - now.getTime());
+
+    window.setTimeout(async () => {
+      await refreshActivityCalendar();
+      scheduleActivityRefreshOnTheHour();
+    }, delay);
+  }
+
   if (calendar) {
     await refreshActivityCalendar();
-    window.setInterval(refreshActivityCalendar, activityRefreshIntervalMs);
+    scheduleActivityRefreshOnTheHour();
   }
 
   if (!list) return;

@@ -88,12 +88,12 @@ body {
 .container {
   max-width: 660px;
   margin: 0 auto;
-  padding: 1.2rem 1.2rem 2rem;
+  padding: 1rem 1rem 1.6rem;
 }
 
 .hero {
-  margin-top: 2rem;
-  margin-bottom: 1.25rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.95rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -225,8 +225,8 @@ body {
 /* Typography & Links */
 h1, h2, h3 {
   line-height: 1.2;
-  margin-top: 2rem;
-  margin-bottom: 0.8rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.62rem;
   color: var(--heading-color);
 }
 
@@ -239,7 +239,7 @@ h3 {
 }
 
 p {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 a {
@@ -276,6 +276,10 @@ a {
   font-size: 1rem;
 }
 
+.current-focus-list li {
+  font-size: 0.96rem;
+}
+
 .about-meta {
   margin: 0 0 1rem;
   color: var(--meta-color);
@@ -285,7 +289,7 @@ a {
 }
 
 .about-copy p {
-  max-width: 58ch;
+  max-width: none;
 }
 
 .tag-list {
@@ -312,8 +316,47 @@ a {
   color: var(--meta-color);
 }
 
+.time-section {
+  margin-bottom: 1.6rem;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.time-card {
+  border: 1px solid #8f8f8f;
+  border-radius: 14px;
+  background: var(--bg-color);
+  padding: 0.7rem 0.75rem;
+}
+
+.time-label {
+  margin: 0;
+  color: var(--meta-color);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.time-value {
+  margin: 0.28rem 0 0.12rem;
+  color: var(--heading-color);
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-meta {
+  margin: 0;
+  color: var(--meta-color);
+  font-size: 0.7rem;
+}
+
 .contributions {
-  margin-bottom: 2.2rem;
+  margin-bottom: 1.6rem;
 }
 
 .section-head {
@@ -346,7 +389,7 @@ a {
 }
 
 .activity-update-note {
-  margin: 0.28rem 0 0.55rem;
+  margin: 0.2rem 0 0.48rem;
   color: var(--meta-color);
   font-size: 0.68rem;
   letter-spacing: 0.06em;
@@ -517,7 +560,7 @@ a:hover {
 
 /* Article List Styling */
 .posts > .section-head {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .posts h2:not(.section-title) {
@@ -536,8 +579,35 @@ a:hover {
 
 .post-list li {
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 0.7rem;
   font-size: 1rem;
+}
+
+.contact-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.contact-list li {
+  margin: 0 0 0.5rem;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.contact-list li:last-child {
+  margin-bottom: 0;
+}
+
+.contact-prefix {
+  display: inline-block;
+  width: 11.2rem;
+  margin-right: 0.6rem;
+  color: var(--meta-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  line-height: 1.2;
 }
 
 /* Using a monospace font just for the dates to keep them neatly aligned */
@@ -551,18 +621,18 @@ a:hover {
 
 /* Footer */
 footer {
-  margin-top: 2.2rem;
-  padding-top: 1rem;
+  margin-top: 1.6rem;
+  padding-top: 0.78rem;
   border-top: 1px solid var(--border-color);
   font-size: 0.78rem;
   color: var(--meta-color);
   text-align: left;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.45rem;
 }
 
 @media (max-width: 700px) {
   .container {
-    padding: 1rem;
+    padding: 0.9rem;
   }
 
   .hero {
@@ -588,6 +658,10 @@ footer {
 
   .contribution-frame {
     padding: 0.7rem 0.55rem 0.45rem;
+  }
+
+  .time-grid {
+    grid-template-columns: 1fr;
   }
 
   .activity-calendar {
