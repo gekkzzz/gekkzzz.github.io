@@ -364,7 +364,6 @@ a {
 
 .activity-shell {
   overflow-x: auto;
-  border-bottom: none;
   color: var(--text-color);
 }
 
