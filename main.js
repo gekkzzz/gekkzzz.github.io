@@ -2,17 +2,45 @@
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
 
+  function cleanupCalendar(container) {
+    const removableTexts = new Set([
+      'Skip to contributions year list',
+      'Contribution Graph'
+    ]);
+
+    container.querySelectorAll('*').forEach((element) => {
+      const text = element.textContent ? element.textContent.trim() : '';
+      if (!text) return;
+
+      if (removableTexts.has(text)) {
+        element.remove();
+        return;
+      }
+
+      const children = Array.from(element.children);
+      if (!children.length) return;
+
+      const isYearOnlyGroup = children.every((child) => /^\d{4}$/.test(child.textContent.trim()));
+      if (isYearOnlyGroup) {
+        element.remove();
+      }
+    });
+  }
+
   if (calendar && typeof window.GitHubCalendar === 'function') {
     window.GitHubCalendar(calendar, 'gekkzzz', {
       responsive: true,
       global_stats: false,
       tooltips: false,
       summary_text: ''
+    }).then(() => {
+      cleanupCalendar(calendar);
+      window.requestAnimationFrame(() => cleanupCalendar(calendar));
     }).catch(() => {
-      calendar.textContent = 'Contribution chart unavailable right now.';
+      calendar.textContent = 'Activity unavailable right now.';
     });
   } else if (calendar) {
-    calendar.textContent = 'Contribution chart unavailable right now.';
+    calendar.textContent = 'Activity unavailable right now.';
   }
 
   if (!list) return;
