@@ -263,7 +263,7 @@
   function formatDate(dateStr) {
     const d = new Date(dateStr);
     if (isNaN(d)) return '';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function formatClockTime(date, timezone) {

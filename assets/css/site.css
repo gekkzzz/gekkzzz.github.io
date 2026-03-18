@@ -252,12 +252,10 @@ a {
 
 .post-list li a {
   color: var(--link-color);
-  border-bottom: none;
 }
 
 .post-list li a:hover {
   color: var(--link-hover);
-  border-bottom: none;
 }
 
 .post-empty {
@@ -618,13 +616,15 @@ a:hover {
   line-height: 1.2;
 }
 
-/* Using a monospace font just for the dates to keep them neatly aligned */
 .post-date {
-  min-width: 80px;
+  display: inline-block;
+  width: 7rem;
+  margin-right: 0.6rem;
   color: var(--meta-color);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8rem;
-  padding-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  line-height: 1.2;
 }
 
 /* Footer */
