@@ -132,6 +132,7 @@
   function buildActivityMatrix(days, start, end) {
     const renderStart = addUtcDays(start, -getMondayBasedDayIndex(start));
     const renderEnd = addUtcDays(end, 6 - getMondayBasedDayIndex(end));
+    const endTime = end.getTime();
     const dayMap = new Map(days.map((entry) => [entry.date, entry]));
     const weeks = [];
 
@@ -140,17 +141,15 @@
 
       for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
         const key = toIsoDate(cursor);
+        const isFuture = cursor.getTime() > endTime;
         const entry = dayMap.get(key);
 
-        if (entry) {
-          week.push({ ...entry, isPadding: false });
+        if (isFuture) {
+          week.push({ date: key, count: 0, level: 0, isPadding: false, isFuture: true });
+        } else if (entry) {
+          week.push({ ...entry, isPadding: false, isFuture: false });
         } else {
-          week.push({
-            date: key,
-            count: 0,
-            level: 0,
-            isPadding: true
-          });
+          week.push({ date: key, count: 0, level: 0, isPadding: true, isFuture: false });
         }
 
         cursor = addUtcDays(cursor, 1);
@@ -201,6 +200,10 @@
     `).join('');
 
     const gridMarkup = weeks.map((week) => week.map((day) => {
+      if (day.isFuture) {
+        return '<span class="activity-cell activity-cell-future" aria-hidden="true"></span>';
+      }
+
       if (day.isPadding) {
         return '<span class="activity-cell activity-level-0 activity-cell-padding" aria-hidden="true"></span>';
       }

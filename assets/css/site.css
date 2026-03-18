@@ -491,6 +491,10 @@ a {
   background: var(--contrib-empty);
 }
 
+.activity-cell-future {
+  background: transparent;
+}
+
 .activity-level-0 {
   background: var(--contrib-empty);
 }
