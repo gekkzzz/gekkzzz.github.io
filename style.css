@@ -273,11 +273,11 @@ a {
 
 .about-list li {
   margin-bottom: 0.4rem;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 .current-focus-list li {
-  font-size: 0.96rem;
+  font-size: 1em;
 }
 
 .about-meta {
@@ -591,7 +591,7 @@ a:hover {
 
 .contact-list li {
   margin: 0 0 0.5rem;
-  font-size: 0.94rem;
+  font-size: 1em;
   line-height: 1.45;
 }
 
