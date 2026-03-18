@@ -1,44 +1,6 @@
 # gekkzzz site
 
-This project is now GitHub Pages compatible.
-
-## GitHub Pages mode (`https://gekkzzz.github.io`)
-
-- Works as a static website with no server required.
-- Guestbook is permanent and shared using GitHub comments (utterances).
-- Everyone can view messages; users with GitHub accounts can post.
-
-### One-time guestbook setup (required)
-
-1. Enable Issues in your repo settings.
-2. Install the utterances GitHub App for your repo:
-	https://github.com/apps/utterances
-3. Push this site update and open the guestbook page once.
-4. First comment creates the guestbook issue thread automatically.
-
-## Optional shared guestbook API
-
-If you want to use your own API instead of GitHub comments, host the Node API and set it in `index.html`:
-
-```html
-<meta name="guestbook-api-url" content="https://your-api-domain.com/api/guestbook">
-```
-
-When this value is set, the frontend uses that API even on GitHub Pages.
-
-## Local development with shared API
-
-1. Start the local server:
-
-```bash
-npm start
-```
-
-2. Open:
-
-```text
-http://localhost:3000
-```
+This is a static site hosted on GitHub Pages.
 
 ## Deploying to GitHub Pages
 

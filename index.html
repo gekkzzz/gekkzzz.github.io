@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="guestbook-api-url" content="">
   <title>gekkzzz - web developer, video essayist, nerd</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -17,6 +16,10 @@
       <header class="hero">
         <div>
           <h1 class="site-title">gekkzzz</h1>
+          <div class="available-badge">
+            <span class="status-dot"></span>
+            <span class="available-text">Available For Work</span>
+          </div>
           <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
           <p class="subtitle">Writing about JavaScript, CSS, and building clean web experiences.</p>
         </div>
@@ -46,28 +49,6 @@
             </li>
           </ul>
         </section>
-
-        <section class="guestbook-section">
-          <div class="guestbook-header">
-            <h2>Guestbook</h2>
-          </div>
-          <p class="guestbook-note">Leave your name and a short message below.</p>
-          <form id="guestbook-form" class="guestbook-form">
-            <label>
-              Name
-              <input id="guestbook-name" type="text" required maxlength="32" autocomplete="name" placeholder="Your name">
-            </label>
-            <label>
-              Message
-              <textarea id="guestbook-message" required maxlength="140" autocomplete="off" aria-describedby="guestbook-char-count" placeholder="Say something nice... (press Enter to submit)"></textarea>
-            </label>
-          </form>
-          <p id="guestbook-mode-note" class="guestbook-mode-note" aria-live="polite"></p>
-          <p id="guestbook-char-count" class="guestbook-char-count" aria-live="polite">0/140</p>
-          <div id="guestbook-feedback" class="guestbook-feedback" aria-live="polite"></div>
-          <div id="guestbook-list" class="guestbook-list"></div>
-          <div id="guestbook-thread" class="guestbook-thread" hidden></div>
-        </section>
       </main>
 
       <footer>
@@ -75,7 +56,5 @@
       </footer>
     </div>
   </div>
-
-  <script type="module" src="main.js"></script>
 </body>
 </html>
