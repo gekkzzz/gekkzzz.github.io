@@ -73,7 +73,7 @@
       today.getUTCMonth(),
       today.getUTCDate()
     );
-    const start = toUtcDate(end.getUTCFullYear() - 1, end.getUTCMonth(), 1);
+    const start = toUtcDate(today.getUTCFullYear(), 0, 1);
     return { start, end };
   }
 
@@ -188,8 +188,12 @@
     const visibleRange = `${monthFormatter.format(start)} ${start.getUTCFullYear()} to ${monthFormatter.format(end)} ${end.getUTCFullYear()}`;
     const weekdayLabels = [
       { label: 'Mon', row: 1 },
+      { label: 'Tue', row: 2 },
       { label: 'Wed', row: 3 },
-      { label: 'Fri', row: 5 }
+      { label: 'Thu', row: 4 },
+      { label: 'Fri', row: 5 },
+      { label: 'Sat', row: 6 },
+      { label: 'Sun', row: 7 }
     ];
 
     const monthMarkup = monthLabels.map((item) => `
