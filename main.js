@@ -48,6 +48,10 @@
     return next;
   }
 
+  function getMondayBasedDayIndex(date) {
+    return (date.getUTCDay() + 6) % 7;
+  }
+
   function clampLevel(level) {
     const numericLevel = Number(level);
     if (!Number.isFinite(numericLevel)) return 0;
@@ -111,8 +115,8 @@
   }
 
   function buildActivityMatrix(days, start, end) {
-    const renderStart = addUtcDays(start, -start.getUTCDay());
-    const renderEnd = addUtcDays(end, 6 - end.getUTCDay());
+    const renderStart = addUtcDays(start, -getMondayBasedDayIndex(start));
+    const renderEnd = addUtcDays(end, 6 - getMondayBasedDayIndex(end));
     const dayMap = new Map(days.map((entry) => [entry.date, entry]));
     const weeks = [];
 
@@ -168,9 +172,9 @@
     const totalContributions = days.reduce((sum, day) => sum + day.count, 0);
     const visibleRange = `${monthFormatter.format(start)} ${start.getUTCFullYear()} to ${monthFormatter.format(end)} ${end.getUTCFullYear()}`;
     const weekdayLabels = [
-      { label: 'Mon', row: 2 },
-      { label: 'Wed', row: 4 },
-      { label: 'Fri', row: 6 }
+      { label: 'Mon', row: 1 },
+      { label: 'Wed', row: 3 },
+      { label: 'Fri', row: 5 }
     ];
 
     const monthMarkup = monthLabels.map((item) => `
@@ -179,7 +183,7 @@
 
     const gridMarkup = weeks.map((week) => week.map((day) => {
       if (day.isPadding) {
-        return '<span class="activity-cell activity-cell-padding" aria-hidden="true"></span>';
+        return '<span class="activity-cell activity-level-0 activity-cell-padding" aria-hidden="true"></span>';
       }
 
       const description = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${accessibleDateFormatter.format(parseIsoDate(day.date))}`;
@@ -208,7 +212,21 @@
             ${gridMarkup}
           </div>
         </div>
-        <p class="activity-meta">${totalContributions} contribution${totalContributions === 1 ? '' : 's'} from ${escapeHtml(visibleRange)}</p>
+        <div class="activity-footer-row">
+          <div class="activity-month-spacer" aria-hidden="true"></div>
+          <div class="activity-footer">
+            <p class="activity-meta">${totalContributions} contribution${totalContributions === 1 ? '' : 's'} from ${escapeHtml(visibleRange)}</p>
+            <div class="activity-legend" aria-label="Contribution level legend">
+              <span class="activity-legend-label">Less</span>
+              <span class="activity-legend-cell activity-level-0" aria-hidden="true"></span>
+              <span class="activity-legend-cell activity-level-1" aria-hidden="true"></span>
+              <span class="activity-legend-cell activity-level-2" aria-hidden="true"></span>
+              <span class="activity-legend-cell activity-level-3" aria-hidden="true"></span>
+              <span class="activity-legend-cell activity-level-4" aria-hidden="true"></span>
+              <span class="activity-legend-label">More</span>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }

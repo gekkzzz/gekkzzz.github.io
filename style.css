@@ -41,12 +41,12 @@
 /* Base Styles & System Fonts */
 body {
   font-family: "JetBrains Mono", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-color);
   background-color: var(--bg-color);
   margin: 0;
   padding: 0;
-  font-size: 18px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -102,7 +102,7 @@ body {
 
 .site-title {
   margin: 0;
-  font-size: clamp(2rem, 7vw, 2.75rem);
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
   line-height: 1.1;
   letter-spacing: -0.025em;
   color: var(--heading-color);
@@ -162,7 +162,7 @@ body {
   margin: 0.4rem 0 0;
   max-width: 40rem;
   color: var(--meta-color);
-  font-size: 1.02rem;
+  font-size: 0.96rem;
   line-height: 1.55;
   font-weight: 400;
 }
@@ -228,6 +228,14 @@ h1, h2, h3 {
   margin-top: 2rem;
   margin-bottom: 0.8rem;
   color: var(--heading-color);
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+h3 {
+  font-size: 0.94rem;
 }
 
 p {
@@ -318,6 +326,7 @@ a {
 
 .section-title {
   margin: 0;
+  font-size: 1rem;
   color: var(--heading-color);
   letter-spacing: normal;
   text-transform: none;
@@ -347,7 +356,7 @@ a {
 }
 
 .contribution-frame:hover {
-  border-color: color-mix(in srgb, var(--link-color) 28%, var(--border-color));
+  border-color: var(--border-color);
 }
 
 .activity-shell {
@@ -425,8 +434,7 @@ a {
 }
 
 .activity-cell-padding {
-  background: transparent;
-  box-shadow: none;
+  background: var(--contrib-empty);
 }
 
 .activity-level-0 {
@@ -449,12 +457,46 @@ a {
   background: var(--contrib-4);
 }
 
+.activity-footer-row {
+  display: grid;
+  grid-template-columns: var(--activity-label-width) max-content;
+  column-gap: 0.45rem;
+  margin-top: 0.72rem;
+}
+
+.activity-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  min-width: max-content;
+}
+
 .activity-meta {
-  margin: 0.8rem 0 0;
+  margin: 0;
   color: var(--meta-color);
   font-size: 0.76rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.activity-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--meta-color);
+}
+
+.activity-legend-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.activity-legend-cell {
+  width: var(--activity-cell-size);
+  height: var(--activity-cell-size);
+  border-radius: 4px;
 }
 
 a:hover {
@@ -485,7 +527,7 @@ a:hover {
 .post-list li {
   display: flex;
   margin-bottom: 1rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 /* Using a monospace font just for the dates to keep them neatly aligned */
@@ -493,7 +535,7 @@ a:hover {
   min-width: 80px;
   color: var(--meta-color);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   padding-top: 0.2rem;
 }
 
@@ -502,7 +544,7 @@ footer {
   margin-top: 2.2rem;
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--meta-color);
   text-align: left;
   margin-bottom: 0.75rem;
@@ -519,7 +561,7 @@ footer {
   }
 
   .hero h1 {
-    font-size: clamp(1.8rem, 12vw, 2.4rem);
+    font-size: clamp(1.3rem, 7vw, 1.55rem);
   }
 
   .hero-links {
@@ -560,7 +602,7 @@ footer {
   }
 
   .hero h1 {
-    font-size: 2rem;
+    font-size: 1.35rem;
   }
 
   .hero-links {
