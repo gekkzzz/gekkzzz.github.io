@@ -2,11 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=/home">
-  <link rel="canonical" href="/home">
-  <title>gekkzzz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gekkzzz - web developer, video essayist, nerd</title>
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
-<body>
-  <p>Redirecting to <a href="/home">/home</a>&hellip;</p>
+<body class="is-site-loading">
+  <div class="page-loader" id="page-loader" aria-hidden="true">
+    <div class="loader-shell">
+      <p class="activity-update-note loader-note">Loading</p>
+      <div class="loader-slot">
+        <div class="loader" aria-hidden="true"></div>
+        <h2 class="section-title loader-done">DONE!</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <a class="corner-avatar-link" href="/home">
+      <img class="corner-avatar" src="assets/images/avatar.png" alt="Avatar">
+    </a>
+
+    <div class="container">
+      <header class="hero">
+        <div>
+          <h1 class="site-title">gekkzzz</h1>
+          <div class="available-badge">
+            <span class="status-dot"></span>
+            <span class="available-text">Available For Work</span>
+          </div>
+          <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
+        </div>
+
+        <nav class="hero-links">
+          <a href="/home">Home</a>
+          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="time-section">
+          <div class="time-grid">
+            <article class="time-card">
+              <p class="time-label">My Time (Liverpool, GB)</p>
+              <p class="time-value" id="my-time">--:--:--</p>
+            </article>
+            <article class="time-card">
+              <p class="time-label" id="your-time-label">Your time</p>
+              <p class="time-value" id="your-time">--:--:--</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="contributions">
+          <div class="section-head">
+            <h2 class="section-title">Activity</h2>
+            <a class="section-link" href="https://github.com/gekkzzz" target="_blank" rel="noopener">View GitHub</a>
+          </div>
+          <p class="activity-update-note">(activity calendar updated every hour)</p>
+          <div id="github-calendar" class="activity-shell contribution-frame">Loading activity&hellip;</div>
+        </section>
+
+        <section class="posts">
+          <div class="section-head">
+            <h2 class="section-title">Latest Blog Posts</h2>
+          </div>
+          <ul class="post-list" id="post-list">
+            <li class="post-empty">Loading&hellip;</li>
+          </ul>
+        </section>
+
+        <section class="resources-section">
+          <div class="section-head">
+            <h2 class="section-title">Check These Out</h2>
+          </div>
+
+          <div class="resources-grid">
+            <article>
+              <p class="resources-heading">Causes</p>
+              <ul class="resources-list">
+                <li><a href="https://www.totalgiving.co.uk/charity-directory" target="_blank" rel="noopener">Charity Directory UK</a></li>
+                <li><a href="https://wearethechange.carrd.co" target="_blank" rel="noopener">We Are The Change</a></li>
+                <li><a href="https://www.un.org/en/global-issues" target="_blank" rel="noopener">UN Global Issues</a></li>
+              </ul>
+            </article>
+
+            <article>
+              <p class="resources-heading">Cool Stuff</p>
+              <ul class="resources-list">
+                <li><a href="https://stats.foldingathome.org" target="_blank" rel="noopener">Folding@Home</a></li>
+                <li><a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener">freeCodeCamp</a></li>
+                <li><a href="https://learn-anything.xyz" target="_blank" rel="noopener">Learn Anything</a></li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>&copy; 2026 gekkzzz. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+  <script src="assets/js/site.js"></script>
 </body>
 </html>
