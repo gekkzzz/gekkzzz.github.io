@@ -291,6 +291,10 @@ body {
   scrollbar-gutter: stable;
 }
 
+.guestbook-thread {
+  margin-top: 0.2rem;
+}
+
 .guestbook-empty {
   margin: 0;
   color: var(--meta-color);

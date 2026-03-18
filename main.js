@@ -1,6 +1,5 @@
 import { createGuestbookApp } from "./guestbook-app.js";
 import { createGuestbookApi } from "./guestbook-api.js";
-import { createLocalGuestbookApi } from "./guestbook-api-local.js";
 
 const CONFIG = Object.freeze({
 	storageKey: "guestbookEntries",
@@ -11,35 +10,46 @@ const CONFIG = Object.freeze({
 	maxEntries: 100,
 	refreshIntervalMs: 15000,
 	remoteOfflineMessage: "Guestbook server is offline. Start it with npm start.",
-	githubPagesModeMessage: "GitHub Pages mode: messages are saved per browser."
+	githubGuestbookRepo: "gekkzzz/gekkzzz.github.io",
+	githubGuestbookIssueTerm: "guestbook",
+	githubGuestbookLabel: "guestbook",
+	githubGuestbookTheme: "preferred-color-scheme",
+	githubPagesModeMessage: "Permanent guestbook mode: sign in with GitHub to post."
 });
 
 const dom = getDomNodes();
 if (dom) {
-	const storage = createStorageAdapter(window.localStorage);
-	const runtime = resolveGuestbookRuntime(storage, CONFIG);
-	const guestbook = createGuestbookApp({
-		dom,
-		storage,
-		api: runtime.api,
-		config: {
-			...CONFIG,
-			offlineMessage: runtime.offlineMessage,
-			modeMessage: runtime.modeMessage
-		}
-	});
-	guestbook.init();
+	const configuredApiUrl = getConfiguredApiUrl();
+
+	if (shouldUseGitHubCommentsMode(configuredApiUrl) && canMountGitHubComments(CONFIG)) {
+		mountGitHubCommentsGuestbook(dom, CONFIG);
+	} else {
+		const storage = createStorageAdapter(window.localStorage);
+		const guestbook = createGuestbookApp({
+			dom,
+			storage,
+			api: createGuestbookApi(configuredApiUrl || "/api/guestbook"),
+			config: {
+				...CONFIG,
+				offlineMessage: CONFIG.remoteOfflineMessage,
+				modeMessage: ""
+			}
+		});
+		guestbook.init();
+	}
 }
 
 function getDomNodes() {
 	const nodes = {
+		note: document.querySelector(".guestbook-note"),
 		form: document.getElementById("guestbook-form"),
 		nameInput: document.getElementById("guestbook-name"),
 		messageInput: document.getElementById("guestbook-message"),
 		feedback: document.getElementById("guestbook-feedback"),
 		list: document.getElementById("guestbook-list"),
 		charCount: document.getElementById("guestbook-char-count"),
-		modeNote: document.getElementById("guestbook-mode-note")
+		modeNote: document.getElementById("guestbook-mode-note"),
+		thread: document.getElementById("guestbook-thread")
 	};
 
 	if (!nodes.form || !nodes.nameInput || !nodes.messageInput || !nodes.feedback || !nodes.list) {
@@ -68,28 +78,6 @@ function createStorageAdapter(storageSource) {
 	};
 }
 
-function resolveGuestbookRuntime(storage, config) {
-	const configuredApiUrl = getConfiguredApiUrl();
-	const runningOnGitHubPages = isGitHubPagesHost(window.location.hostname);
-
-	if (!configuredApiUrl && runningOnGitHubPages) {
-		return {
-			api: createLocalGuestbookApi(storage, {
-				storageKey: config.storageKey,
-				maxEntries: config.maxEntries
-			}),
-			offlineMessage: "",
-			modeMessage: config.githubPagesModeMessage
-		};
-	}
-
-	return {
-		api: createGuestbookApi(configuredApiUrl || "/api/guestbook"),
-		offlineMessage: config.remoteOfflineMessage,
-		modeMessage: ""
-	};
-}
-
 function getConfiguredApiUrl() {
 	const tag = document.querySelector('meta[name="guestbook-api-url"]');
 	if (!tag) {
@@ -102,6 +90,59 @@ function getConfiguredApiUrl() {
 	}
 
 	return value;
+}
+
+function shouldUseGitHubCommentsMode(configuredApiUrl) {
+	return !configuredApiUrl && isGitHubPagesHost(window.location.hostname);
+}
+
+function canMountGitHubComments(config) {
+	return Boolean(config.githubGuestbookRepo && config.githubGuestbookIssueTerm);
+}
+
+function mountGitHubCommentsGuestbook(dom, config) {
+	if (dom.note) {
+		dom.note.textContent = "Permanent guestbook: leave a message in the GitHub thread below.";
+	}
+
+	if (dom.form) {
+		dom.form.hidden = true;
+	}
+	if (dom.charCount) {
+		dom.charCount.hidden = true;
+	}
+	if (dom.feedback) {
+		dom.feedback.hidden = true;
+		dom.feedback.textContent = "";
+		delete dom.feedback.dataset.state;
+	}
+	if (dom.list) {
+		dom.list.hidden = true;
+	}
+
+	if (dom.modeNote) {
+		dom.modeNote.textContent = config.githubPagesModeMessage;
+	}
+
+	if (!dom.thread) {
+		return;
+	}
+
+	dom.thread.hidden = false;
+
+	const script = document.createElement("script");
+	script.src = "https://utteranc.es/client.js";
+	script.async = true;
+	script.setAttribute("repo", config.githubGuestbookRepo);
+	script.setAttribute("issue-term", config.githubGuestbookIssueTerm);
+	script.setAttribute("theme", config.githubGuestbookTheme);
+	script.setAttribute("crossorigin", "anonymous");
+
+	if (config.githubGuestbookLabel) {
+		script.setAttribute("label", config.githubGuestbookLabel);
+	}
+
+	dom.thread.replaceChildren(script);
 }
 
 function isGitHubPagesHost(hostname) {
