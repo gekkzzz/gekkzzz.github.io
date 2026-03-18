@@ -11,7 +11,7 @@
   --border-color: #dddddd;
   --status-color: #22c55e;
   --status-glow: rgba(34, 197, 94, 0.58);
-  --contrib-empty: #d7e6fb;
+  --contrib-empty: var(--meta-color);
   --contrib-1: #b6d1f6;
   --contrib-2: #7eaee8;
   --contrib-3: #4d87d7;
@@ -30,7 +30,7 @@
     --border-color: #333333;
     --status-color: #4ade80;
     --status-glow: rgba(74, 222, 128, 0.6);
-    --contrib-empty: #21324a;
+    --contrib-empty: var(--meta-color);
     --contrib-1: #244667;
     --contrib-2: #2d5f91;
     --contrib-3: #3a82c7;
@@ -344,63 +344,112 @@ a {
   border-color: color-mix(in srgb, var(--link-color) 28%, var(--border-color));
 }
 
-.calendar {
-  min-height: 132px;
+.activity-shell {
+  overflow-x: auto;
   border-bottom: none;
   color: var(--text-color);
 }
 
-.calendar .width-full > .float-left {
-  display: none;
+.activity-calendar {
+  --activity-cell-size: 12px;
+  --activity-gap: 4px;
+  --activity-label-width: 2.1rem;
+  min-width: max-content;
 }
 
-.calendar .float-left.text-gray {
+.activity-month-row,
+.activity-grid-row {
+  display: grid;
+  grid-template-columns: var(--activity-label-width) max-content;
+  column-gap: 0.45rem;
+  align-items: start;
+}
+
+.activity-month-spacer {
+  width: var(--activity-label-width);
+}
+
+.activity-months {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), var(--activity-cell-size));
+  column-gap: var(--activity-gap);
+  min-width: max-content;
+  margin-bottom: 0.4rem;
+  min-height: 0.95rem;
+}
+
+.activity-month {
   color: var(--meta-color);
+  font-size: 0.7rem;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.calendar .ContributionCalendar-label,
-.calendar text {
-  fill: var(--meta-color);
+.activity-weekdays {
+  display: grid;
+  grid-template-rows: repeat(7, var(--activity-cell-size));
+  row-gap: var(--activity-gap);
+  width: var(--activity-label-width);
+}
+
+.activity-weekdays span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.35rem;
   color: var(--meta-color);
+  font-size: 0.68rem;
+  line-height: 1;
 }
 
-.calendar .ContributionCalendar-day,
-.calendar rect.ContributionCalendar-day {
-  rx: 3px;
-  ry: 3px;
-  shape-rendering: geometricPrecision;
-  stroke: color-mix(in srgb, var(--bg-color) 55%, var(--border-color)) !important;
-  stroke-width: 1px;
+.activity-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--activity-cell-size);
+  grid-template-rows: repeat(7, var(--activity-cell-size));
+  gap: var(--activity-gap);
+  min-width: max-content;
 }
 
-.calendar .ContributionCalendar-day[data-level="0"],
-.calendar rect.ContributionCalendar-day[data-level="0"],
-.calendar svg rect[data-level="0"] {
-  fill: var(--contrib-empty) !important;
+.activity-cell {
+  width: var(--activity-cell-size);
+  height: var(--activity-cell-size);
+  border-radius: 4px;
+  background: var(--contrib-empty);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bg-color) 62%, transparent);
 }
 
-.calendar .ContributionCalendar-day[data-level="1"],
-.calendar rect.ContributionCalendar-day[data-level="1"],
-.calendar svg rect[data-level="1"] {
-  fill: var(--contrib-1) !important;
+.activity-cell-padding {
+  background: transparent;
+  box-shadow: none;
 }
 
-.calendar .ContributionCalendar-day[data-level="2"],
-.calendar rect.ContributionCalendar-day[data-level="2"],
-.calendar svg rect[data-level="2"] {
-  fill: var(--contrib-2) !important;
+.activity-level-0 {
+  background: var(--contrib-empty);
 }
 
-.calendar .ContributionCalendar-day[data-level="3"],
-.calendar rect.ContributionCalendar-day[data-level="3"],
-.calendar svg rect[data-level="3"] {
-  fill: var(--contrib-3) !important;
+.activity-level-1 {
+  background: var(--contrib-1);
 }
 
-.calendar .ContributionCalendar-day[data-level="4"],
-.calendar rect.ContributionCalendar-day[data-level="4"],
-.calendar svg rect[data-level="4"] {
-  fill: var(--contrib-4) !important;
+.activity-level-2 {
+  background: var(--contrib-2);
+}
+
+.activity-level-3 {
+  background: var(--contrib-3);
+}
+
+.activity-level-4 {
+  background: var(--contrib-4);
+}
+
+.activity-meta {
+  margin: 0.8rem 0 0;
+  color: var(--meta-color);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 a:hover {
@@ -478,6 +527,12 @@ footer {
 
   .contribution-frame {
     padding: 0.7rem 0.55rem 0.45rem;
+  }
+
+  .activity-calendar {
+    --activity-cell-size: 11px;
+    --activity-gap: 3px;
+    --activity-label-width: 2rem;
   }
 }
 

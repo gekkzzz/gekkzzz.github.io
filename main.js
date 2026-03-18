@@ -1,54 +1,216 @@
 (async function () {
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
-
-  function cleanupCalendar(container) {
-    const removableTexts = new Set([
-      'Skip to contributions year list',
-      'Contribution Graph'
-    ]);
-
-    container.querySelectorAll('*').forEach((element) => {
-      const text = element.textContent ? element.textContent.trim() : '';
-      if (!text) return;
-
-      if (removableTexts.has(text)) {
-        element.remove();
-        return;
-      }
-
-      const children = Array.from(element.children);
-      if (!children.length) return;
-
-      const isYearOnlyGroup = children.every((child) => /^\d{4}$/.test(child.textContent.trim()));
-      if (isYearOnlyGroup) {
-        element.remove();
-      }
-    });
-  }
-
-  if (calendar && typeof window.GitHubCalendar === 'function') {
-    window.GitHubCalendar(calendar, 'gekkzzz', {
-      responsive: true,
-      global_stats: false,
-      tooltips: false,
-      summary_text: ''
-    }).then(() => {
-      cleanupCalendar(calendar);
-      window.requestAnimationFrame(() => cleanupCalendar(calendar));
-    }).catch(() => {
-      calendar.textContent = 'Activity unavailable right now.';
-    });
-  } else if (calendar) {
-    calendar.textContent = 'Activity unavailable right now.';
-  }
-
-  if (!list) return;
+  const activityUsername = 'gekkzzz';
+  const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
+  const monthFormatter = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    timeZone: 'UTC'
+  });
+  const accessibleDateFormatter = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+  const msPerDay = 24 * 60 * 60 * 1000;
 
   function escapeHtml(str) {
     const d = document.createElement('div');
     d.textContent = String(str);
     return d.innerHTML;
+  }
+
+  function escapeAttribute(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function toUtcDate(year, month, day) {
+    return new Date(Date.UTC(year, month, day));
+  }
+
+  function parseIsoDate(dateStr) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return toUtcDate(year, month - 1, day);
+  }
+
+  function toIsoDate(date) {
+    return date.toISOString().slice(0, 10);
+  }
+
+  function addUtcDays(date, amount) {
+    const next = new Date(date);
+    next.setUTCDate(next.getUTCDate() + amount);
+    return next;
+  }
+
+  function clampLevel(level) {
+    const numericLevel = Number(level);
+    if (!Number.isFinite(numericLevel)) return 0;
+    return Math.max(0, Math.min(4, numericLevel));
+  }
+
+  function getActivityRange(today = new Date()) {
+    const end = toUtcDate(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate()
+    );
+    const start = toUtcDate(end.getUTCFullYear() - 1, end.getUTCMonth(), 1);
+    return { start, end };
+  }
+
+  async function fetchActivityDays(username, start, end) {
+    const years = Array.from(new Set([
+      start.getUTCFullYear(),
+      end.getUTCFullYear()
+    ]));
+
+    const payloads = await Promise.all(years.map(async (year) => {
+      const response = await fetch(`${activityApiBase}${encodeURIComponent(username)}?y=${year}`);
+      if (!response.ok) {
+        throw new Error('activity fetch failed');
+      }
+
+      return response.json();
+    }));
+
+    const dayMap = new Map();
+
+    payloads.forEach((payload) => {
+      if (!Array.isArray(payload.contributions)) return;
+
+      payload.contributions.forEach((entry) => {
+        if (!entry || !entry.date) return;
+
+        dayMap.set(entry.date, {
+          count: Number(entry.count) || 0,
+          level: clampLevel(entry.level)
+        });
+      });
+    });
+
+    const days = [];
+
+    for (let cursor = new Date(start); cursor <= end; cursor = addUtcDays(cursor, 1)) {
+      const key = toIsoDate(cursor);
+      const entry = dayMap.get(key) || { count: 0, level: 0 };
+
+      days.push({
+        date: key,
+        count: entry.count,
+        level: entry.level
+      });
+    }
+
+    return days;
+  }
+
+  function buildActivityMatrix(days, start, end) {
+    const renderStart = addUtcDays(start, -start.getUTCDay());
+    const renderEnd = addUtcDays(end, 6 - end.getUTCDay());
+    const dayMap = new Map(days.map((entry) => [entry.date, entry]));
+    const weeks = [];
+
+    for (let cursor = new Date(renderStart); cursor <= renderEnd;) {
+      const week = [];
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+        const key = toIsoDate(cursor);
+        const entry = dayMap.get(key);
+
+        if (entry) {
+          week.push({ ...entry, isPadding: false });
+        } else {
+          week.push({
+            date: key,
+            count: 0,
+            level: 0,
+            isPadding: true
+          });
+        }
+
+        cursor = addUtcDays(cursor, 1);
+      }
+
+      weeks.push(week);
+    }
+
+    return { weeks, renderStart };
+  }
+
+  function buildMonthLabels(start, end, renderStart) {
+    const labels = [];
+
+    for (
+      let cursor = new Date(start);
+      cursor <= end;
+      cursor = toUtcDate(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1)
+    ) {
+      const offset = Math.round((cursor - renderStart) / msPerDay);
+
+      labels.push({
+        label: monthFormatter.format(cursor),
+        weekIndex: Math.floor(offset / 7) + 1
+      });
+    }
+
+    return labels;
+  }
+
+  function renderActivityCalendar(container, days, start, end) {
+    const { weeks, renderStart } = buildActivityMatrix(days, start, end);
+    const monthLabels = buildMonthLabels(start, end, renderStart);
+    const totalContributions = days.reduce((sum, day) => sum + day.count, 0);
+    const visibleRange = `${monthFormatter.format(start)} ${start.getUTCFullYear()} to ${monthFormatter.format(end)} ${end.getUTCFullYear()}`;
+    const weekdayLabels = [
+      { label: 'Mon', row: 2 },
+      { label: 'Wed', row: 4 },
+      { label: 'Fri', row: 6 }
+    ];
+
+    const monthMarkup = monthLabels.map((item) => `
+      <span class="activity-month" style="grid-column:${item.weekIndex};">${item.label}</span>
+    `).join('');
+
+    const gridMarkup = weeks.map((week) => week.map((day) => {
+      if (day.isPadding) {
+        return '<span class="activity-cell activity-cell-padding" aria-hidden="true"></span>';
+      }
+
+      const description = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${accessibleDateFormatter.format(parseIsoDate(day.date))}`;
+
+      return `
+        <span
+          class="activity-cell activity-level-${day.level}"
+          role="gridcell"
+          aria-label="${escapeAttribute(description)}"
+          title="${escapeAttribute(description)}"
+        ></span>
+      `;
+    }).join('')).join('');
+
+    container.innerHTML = `
+      <div class="activity-calendar" style="--weeks:${weeks.length};">
+        <div class="activity-month-row">
+          <div class="activity-month-spacer" aria-hidden="true"></div>
+          <div class="activity-months" aria-hidden="true">${monthMarkup}</div>
+        </div>
+        <div class="activity-grid-row">
+          <div class="activity-weekdays" aria-hidden="true">
+            ${weekdayLabels.map((item) => `<span style="grid-row:${item.row};">${item.label}</span>`).join('')}
+          </div>
+          <div class="activity-grid" role="grid" aria-label="GitHub activity from ${escapeAttribute(visibleRange)}">
+            ${gridMarkup}
+          </div>
+        </div>
+        <p class="activity-meta">${totalContributions} contribution${totalContributions === 1 ? '' : 's'} from ${escapeHtml(visibleRange)}</p>
+      </div>
+    `;
   }
 
   function safeUrl(url) {
@@ -63,6 +225,18 @@
     if (isNaN(d)) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
+
+  if (calendar) {
+    try {
+      const { start, end } = getActivityRange();
+      const activityDays = await fetchActivityDays(activityUsername, start, end);
+      renderActivityCalendar(calendar, activityDays, start, end);
+    } catch {
+      calendar.textContent = 'Activity unavailable right now.';
+    }
+  }
+
+  if (!list) return;
 
   try {
     const rssUrl = 'https://gekkzzz.substack.com/feed';
