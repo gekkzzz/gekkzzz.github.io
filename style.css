@@ -349,14 +349,17 @@ a {
   display: block;
   margin-top: 0.25rem;
   padding: 0.85rem 0.85rem 0.65rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid #8f8f8f;
   border-radius: 14px;
-  background: var(--bg-color);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  background-image: none;
+  box-shadow: none;
+  border-image: none;
 }
 
 .contribution-frame:hover {
-  border-color: var(--border-color);
+  border-color: #8f8f8f;
+  background-image: none;
 }
 
 .activity-shell {
