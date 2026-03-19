@@ -1006,17 +1006,6 @@ footer .resources-grid {
   color: var(--heading-color);
 }
 
-.cookie-btn-reset {
-  background: transparent;
-  border-color: var(--border-color);
-  color: var(--meta-color);
-  font-size: 0.75rem;
-}
-
-.cookie-btn-reset:hover {
-  border-color: var(--meta-color);
-}
-
 /* Cookie Policy Page */
 .cookie-policy h3 {
   margin-top: 1.5rem;

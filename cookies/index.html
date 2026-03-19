@@ -85,7 +85,6 @@
             <div class="preferences-buttons">
               <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept Location Lookup</button>
               <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject Location Lookup</button>
-              <button id="cookie-reset-btn" class="cookie-btn cookie-btn-reset">Reset & Ask Again</button>
             </div>
             <p id="cookie-status" class="cookie-status-message" style="margin-top: 1rem; text-align: center;"></p>
           </div>
@@ -134,7 +133,6 @@
 
     const acceptBtn = document.getElementById('cookie-accept-btn');
     const rejectBtn = document.getElementById('cookie-reject-btn');
-    const resetBtn = document.getElementById('cookie-reset-btn');
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', () => {
@@ -146,13 +144,6 @@
     if (rejectBtn) {
       rejectBtn.addEventListener('click', () => {
         localStorage.setItem('gekkzzz-cookie-consent', 'reject');
-        updateCookieStatus();
-      });
-    }
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        localStorage.removeItem('gekkzzz-cookie-consent');
         updateCookieStatus();
       });
     }
