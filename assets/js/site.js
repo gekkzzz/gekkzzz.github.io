@@ -21,7 +21,7 @@
   let hasShownLoaderDone = false;
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
-  let userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+  let userTimezone = 'UTC'; // Will be detected later after getCanonicalTimezone is defined
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
   const activityRefreshIntervalMs = 60 * 60 * 1000;
@@ -716,6 +716,9 @@
     return Boolean(getCanonicalTimezone(timezone));
   }
 
+  // Initialize user timezone from device now that getCanonicalTimezone is available
+  userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+
   function normalizeLocationPayload(payload) {
     if (!payload || payload.success === false) return null;
 
@@ -800,7 +803,8 @@
   if (myTimeElement || yourTimeElement) {
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
-    await detectUserTimeFromLocation();
+    // Defer to next tick so this function returns immediately
+    Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
   }
 
   async function refreshActivityCalendar() {
@@ -835,31 +839,35 @@
   }
 
   if (calendar) {
-    await refreshActivityCalendar();
+    // Defer to next tick so this function returns immediately
+    Promise.resolve().then(() => refreshActivityCalendar()).catch(() => {});
     scheduleActivityRefreshOnTheHour();
   }
 
-  if (!list) return;
+  if (list) {
+    // Defer to next tick so this function returns immediately
+    Promise.resolve().then(async () => {
+      try {
+        const rssUrl = 'https://gekkzzz.substack.com/feed';
+        const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
 
-  try {
-    const rssUrl = 'https://gekkzzz.substack.com/feed';
-    const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
-    const res = await fetch(apiUrl);
-    if (!res.ok) throw new Error('fetch failed');
-    const data = await res.json();
+        if (data.status !== 'ok' || !Array.isArray(data.items) || data.items.length === 0) {
+          list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
+          return;
+        }
 
-    if (data.status !== 'ok' || !Array.isArray(data.items) || data.items.length === 0) {
-      list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
-      return;
-    }
-
-    list.innerHTML = data.items.slice(0, 5).map(post => `
-      <li>
-        <span class="post-date">${escapeHtml(formatDate(post.pubDate))}</span>
-        <a href="${safeUrl(post.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(post.title)}</a>
-      </li>
-    `).join('');
-  } catch {
-    list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
+        list.innerHTML = data.items.slice(0, 5).map(post => `
+          <li>
+            <span class="post-date">${escapeHtml(formatDate(post.pubDate))}</span>
+            <a href="${safeUrl(post.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(post.title)}</a>
+          </li>
+        `).join('');
+      } catch {
+        list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
+      }
+    }).catch(() => {});
   }
 })();
