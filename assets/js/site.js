@@ -908,22 +908,30 @@
     Promise.resolve().then(async () => {
       try {
         const rssUrl = 'https://gekkzzz.substack.com/feed';
-        const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
-        const res = await fetch(apiUrl);
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
+        const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error('fetch failed');
-        const data = await res.json();
+        const text = await res.text();
+        const xml = new DOMParser().parseFromString(text, 'text/xml');
+        const items = Array.from(xml.getElementsByTagName('item')).slice(0, 3);
 
-        if (data.status !== 'ok' || !Array.isArray(data.items) || data.items.length === 0) {
+        if (items.length === 0) {
           list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
           return;
         }
 
-        list.innerHTML = data.items.slice(0, 5).map(post => `
+        list.innerHTML = items.map(item => {
+          const title = item.getElementsByTagName('title')[0]?.textContent || '';
+          const link = item.getElementsByTagName('link')[0]?.textContent
+            || item.getElementsByTagName('guid')[0]?.textContent || '';
+          const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
+          return `
           <li>
-            <span class="post-date">${escapeHtml(formatDate(post.pubDate))}</span>
-            <a href="${safeUrl(post.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(post.title)}</a>
+            <span class="post-date">${escapeHtml(formatDate(pubDate))}</span>
+            <a href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a>
           </li>
-        `).join('');
+        `;
+        }).join('');
       } catch {
         list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
       }
