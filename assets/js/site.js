@@ -439,6 +439,16 @@
     return Math.max(0, Math.min(4, numericLevel));
   }
 
+  function recomputeLevels(days) {
+    const max = Math.max(0, ...days.map(d => d.count));
+    if (max === 0) return days;
+
+    return days.map(d => {
+      if (d.count === 0) return { ...d, level: 0 };
+      return { ...d, level: Math.ceil((d.count / max) * 4) };
+    });
+  }
+
   function getActivityRange(today = new Date()) {
     const end = toUtcDate(
       today.getUTCFullYear(),
@@ -498,7 +508,7 @@
       });
     }
 
-    return days;
+    return recomputeLevels(days);
   }
 
   function buildActivityMatrix(days, start, end) {

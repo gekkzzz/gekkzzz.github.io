@@ -12,10 +12,10 @@
   --status-color: #4ade80;
   --status-glow: rgba(74, 222, 128, 0.6);
   --contrib-empty: var(--meta-color);
-  --contrib-1: #244667;
-  --contrib-2: #2d5f91;
-  --contrib-3: #3a82c7;
-  --contrib-4: #69a8f2;
+  --contrib-1: #152d42;
+  --contrib-2: #1b5585;
+  --contrib-3: #2d8cd6;
+  --contrib-4: #7dcfff;
 }
 
 .page-loader {
