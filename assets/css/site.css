@@ -158,43 +158,13 @@ body {
   left: 0.6rem;
   z-index: 30;
   border-radius: 50%;
-  overflow: visible;
+  overflow: hidden;
   display: block;
   width: 44px;
   height: 44px;
   border: 1px solid var(--border-color);
   background: var(--bg-color);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
-}
-
-.corner-avatar-link[title]::after {
-  content: attr(title);
-  position: absolute;
-  left: calc(100% + 0.5rem);
-  top: 50%;
-  transform: translateY(-50%) scale(0.98);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 35;
-  white-space: nowrap;
-  padding: 0.28rem 0.52rem;
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  background: rgba(18, 18, 18, 0.96);
-  color: var(--heading-color);
-  font-size: 0.62rem;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  transition: opacity 0.14s ease, transform 0.14s ease;
-  transition-delay: 0s;
-}
-
-.corner-avatar-link[title]:hover::after,
-.corner-avatar-link[title]:focus-visible::after {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
-  transition-delay: 5s;
 }
 
 .corner-avatar {

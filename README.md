@@ -37,7 +37,7 @@ This site is a central landing page to show who I am, what I am building, what I
 - Avatar hover hint with delayed reveal text.
 
 ### Hidden extra
-- Added the ability to play pong, im not telling you how though.
+- Added the ability to play pong, I'm not telling you how though.
 - Supports keyboard, mouse, and touch controls once you find it.
 
 ## Project structure
