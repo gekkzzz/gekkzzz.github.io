@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Policy - gekkzzz</title>
+  <link rel="icon" type="image/png" href="../assets/images/avatar.png">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="is-site-loading">
+  <div class="page-loader" id="page-loader" aria-hidden="true">
+    <div class="loader-shell">
+      <p class="activity-update-note loader-note">Loading</p>
+      <div class="loader-slot">
+        <div class="loader" aria-hidden="true"></div>
+        <h2 class="section-title loader-done">DONE!</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <a class="corner-avatar-link" href="/" aria-label="Back to home">
+      <img class="corner-avatar" src="../assets/images/avatar.png" alt="Avatar">
+    </a>
+
+    <div class="container">
+      <header class="hero">
+        <div>
+          <h1 class="site-title">Cookie Policy</h1>
+          <p class="eyebrow">Transparency & Your Control</p>
+        </div>
+
+        <nav class="hero-links">
+          <a href="/">Home</a>
+          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="posts cookie-policy">
+          <div class="section-head">
+            <h2 class="section-title">What cookies do I use?</h2>
+          </div>
+
+          <p>This site is intentionally minimal and avoids unnecessary tracking. I use a single type of optional data storage:</p>
+
+          <h3>Location/Timezone Lookup (Non-Essential)</h3>
+          <p>
+            <strong>What:</strong> When you visit the home page, an optional feature shows "Your time" based on your timezone. To provide this, the site can fetch your timezone and approximate location (city, country) from IP-based APIs (<code>ipwho.is</code> and <code>ipinfo.io</code>).
+          </p>
+          <p>
+            <strong>Why:</strong> This enriches the "Your time" display so it shows something like "Your time (New York, US)" instead of just a timezone code. It's purely a UX enhancement.
+          </p>
+          <p>
+            <strong>Your IP is:</strong>
+          </p>
+          <ul class="about-list">
+            <li>Sent solely to determine timezone and city/country.</li>
+            <li>Not stored by this site.</li>
+            <li>Subject to the privacy policies of <code>ipwho.is</code> and <code>ipinfo.io</code> respectively.</li>
+          </ul>
+
+          <p><strong>If you reject:</strong> The "Your time" display will still work, but it will show your computer's local timezone without any location enrichment.</p>
+
+          <h3>Session Storage (Essential)</h3>
+          <p>
+            <strong>What:</strong> The site uses browser session storage to skip the page loader on subsequent internal page navigation within the same browsing session.
+          </p>
+          <p>
+            <strong>Why:</strong> The animated loader is only meant to show once. Using session storage avoids replaying it every time you click a link within the site.
+          </p>
+          <p>
+            <strong>Your choice:</strong> This is necessary for the site to feel responsive and is always enabled.
+          </p>
+
+          <div class="section-head" style="margin-top: 2rem;">
+            <h2 class="section-title">Your Preference</h2>
+          </div>
+
+          <p>I respect your choice. Below, you can view and change your cookie consent settings:</p>
+
+          <div class="cookie-preferences-box">
+            <div class="preferences-buttons">
+              <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept Location Lookup</button>
+              <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject Location Lookup</button>
+              <button id="cookie-reset-btn" class="cookie-btn cookie-btn-reset">Reset & Ask Again</button>
+            </div>
+            <p id="cookie-status" class="cookie-status-message" style="margin-top: 1rem; text-align: center;"></p>
+          </div>
+
+          <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--meta-color);">
+            Your choice is stored locally in your browser and never leaves your device. You can change it anytime by returning to this page.
+          </p>
+
+          <div class="section-head" style="margin-top: 2rem;">
+            <h2 class="section-title">Questions?</h2>
+          </div>
+
+          <p>
+            If you have questions about privacy or how this site works, feel free to <a href="/contact">get in touch</a>. I'm transparent about what I collect and why.
+          </p>
+        </section>
+      </main>
+
+      <footer>
+        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../assets/js/site.js"></script>
+
+  <script>
+    // Cookie preference management for the policy page
+    function updateCookieStatus() {
+      const consent = localStorage.getItem('gekkzzz-cookie-consent');
+      const statusEl = document.getElementById('cookie-status');
+      
+      if (!statusEl) return;
+
+      if (consent === 'accept') {
+        statusEl.textContent = '✓ You have accepted location lookup. The site will enrich your timezone display.';
+        statusEl.style.color = 'var(--status-color)';
+      } else if (consent === 'reject') {
+        statusEl.textContent = '✗ You have rejected location lookup. Your time will be based on your computer\'s timezone only.';
+        statusEl.style.color = 'var(--meta-color)';
+      } else {
+        statusEl.textContent = 'No preference set. The consent banner will appear on the home page.';
+        statusEl.style.color = 'var(--meta-color)';
+      }
+    }
+
+    const acceptBtn = document.getElementById('cookie-accept-btn');
+    const rejectBtn = document.getElementById('cookie-reject-btn');
+    const resetBtn = document.getElementById('cookie-reset-btn');
+
+    if (acceptBtn) {
+      acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('gekkzzz-cookie-consent', 'accept');
+        updateCookieStatus();
+      });
+    }
+
+    if (rejectBtn) {
+      rejectBtn.addEventListener('click', () => {
+        localStorage.setItem('gekkzzz-cookie-consent', 'reject');
+        updateCookieStatus();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem('gekkzzz-cookie-consent');
+        updateCookieStatus();
+      });
+    }
+
+    // Initialize status on page load
+    updateCookieStatus();
+  </script>
+</body>
+</html>

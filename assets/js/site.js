@@ -8,6 +8,7 @@
   const pageLoaderElement = document.getElementById('page-loader');
   const loaderElement = pageLoaderElement ? pageLoaderElement.querySelector('.loader') : null;
   const loaderSkipNavigationKey = 'gekkzzz.site-loader.skip-next-nav';
+  const cookieConsentKey = 'gekkzzz-cookie-consent';
   const minLoaderDurationMs = 3000;
   const maxLoaderDurationMs = 7000;
   const loaderFadeDurationMs = 420;
@@ -350,7 +351,51 @@
       if (pageLoaderElement.parentElement) {
         pageLoaderElement.parentElement.removeChild(pageLoaderElement);
       }
+
+      // Show cookie banner after loader is hidden if consent not yet given
+      const cookieConsent = localStorage.getItem(cookieConsentKey);
+      if (!cookieConsent && (myTimeElement || yourTimeElement)) {
+        showCookieBanner();
+      }
     }, loaderFadeDurationMs);
+  }
+
+  function createCookieBanner() {
+    const banner = document.createElement('div');
+    banner.className = 'cookie-banner';
+    banner.id = 'cookie-banner';
+    banner.innerHTML = `
+      <p class="cookie-banner-message">I use some non-essential cookies to power a few extra features and make the site look and feel better. Your call!</p>
+      <div class="cookie-banner-buttons">
+        <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept</button>
+        <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject</button>
+        <a href="/cookies" class="cookie-btn" style="text-decoration: none; line-height: 1;">Cookie Policy</a>
+      </div>
+    `;
+    return banner;
+  }
+
+  function showCookieBanner() {
+    const existingBanner = document.getElementById('cookie-banner');
+    if (existingBanner) return;
+
+    const banner = createCookieBanner();
+    document.body.appendChild(banner);
+
+    const acceptBtn = banner.querySelector('#cookie-accept-btn');
+    const rejectBtn = banner.querySelector('#cookie-reject-btn');
+
+    acceptBtn.addEventListener('click', () => {
+      localStorage.setItem(cookieConsentKey, 'accept');
+      banner.classList.add('hidden');
+      // Immediately detect location and update time display
+      detectUserTimeFromLocation();
+    });
+
+    rejectBtn.addEventListener('click', () => {
+      localStorage.setItem(cookieConsentKey, 'reject');
+      banner.classList.add('hidden');
+    });
   }
 
   function startPageLoaderFinish() {
@@ -813,8 +858,12 @@
   if (myTimeElement || yourTimeElement) {
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
-    // Defer to next tick so this function returns immediately
-    Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
+    // Only do IP lookup if consent is given
+    const cookieConsent = localStorage.getItem(cookieConsentKey);
+    if (cookieConsent === 'accept') {
+      // Defer to next tick so this function returns immediately
+      Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
+    }
   }
 
   async function refreshActivityCalendar() {
