@@ -275,6 +275,88 @@
     }
   }
 
+  function normalizeCookieConsentValue(value) {
+    return value === 'accept' || value === 'reject' ? value : null;
+  }
+
+  function getCookieValue(name) {
+    const encodedName = encodeURIComponent(name);
+    const prefix = `${encodedName}=`;
+    const cookieParts = document.cookie ? document.cookie.split('; ') : [];
+
+    for (const cookiePart of cookieParts) {
+      if (!cookiePart.startsWith(prefix)) continue;
+      return decodeURIComponent(cookiePart.slice(prefix.length));
+    }
+
+    return null;
+  }
+
+  function setCookieValue(name, value, maxAgeSeconds) {
+    const encodedName = encodeURIComponent(name);
+    const encodedValue = encodeURIComponent(value);
+    const maxAge = Number.isFinite(maxAgeSeconds)
+      ? Math.max(0, Math.floor(maxAgeSeconds))
+      : 0;
+
+    document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  }
+
+  function getLocalCookieConsent() {
+    try {
+      return normalizeCookieConsentValue(window.localStorage.getItem(cookieConsentKey));
+    } catch {
+      return null;
+    }
+  }
+
+  function setLocalCookieConsent(value) {
+    try {
+      window.localStorage.setItem(cookieConsentKey, value);
+    } catch {
+      // Ignore storage failures; cookie remains source of truth.
+    }
+  }
+
+  function clearLocalCookieConsent() {
+    try {
+      window.localStorage.removeItem(cookieConsentKey);
+    } catch {
+      // Ignore storage failures.
+    }
+  }
+
+  function getCookieConsent() {
+    const consentFromCookie = normalizeCookieConsentValue(getCookieValue(cookieConsentKey));
+    const consentFromStorage = getLocalCookieConsent();
+
+    if (!consentFromCookie && consentFromStorage) {
+      // If consent cookie is missing, treat consent as reset and clear stale local storage.
+      clearLocalCookieConsent();
+      return null;
+    }
+
+    if (consentFromCookie && consentFromStorage !== consentFromCookie) {
+      setLocalCookieConsent(consentFromCookie);
+    }
+
+    return consentFromCookie;
+  }
+
+  function setCookieConsent(value) {
+    const consent = normalizeCookieConsentValue(value);
+    const oneYearInSeconds = 60 * 60 * 24 * 365;
+
+    if (!consent) {
+      setCookieValue(cookieConsentKey, '', 0);
+      clearLocalCookieConsent();
+      return;
+    }
+
+    setCookieValue(cookieConsentKey, consent, oneYearInSeconds);
+    setLocalCookieConsent(consent);
+  }
+
   function markInternalPageNavigations() {
     const anchors = document.querySelectorAll('a[href]');
     if (!anchors.length) return;
@@ -353,7 +435,7 @@
       }
 
       // Show cookie banner after loader is hidden if consent not yet given
-      const cookieConsent = localStorage.getItem(cookieConsentKey);
+      const cookieConsent = getCookieConsent();
       if (!cookieConsent && (myTimeElement || yourTimeElement)) {
         showCookieBanner();
       }
@@ -386,14 +468,14 @@
     const rejectBtn = banner.querySelector('#cookie-reject-btn');
 
     acceptBtn.addEventListener('click', () => {
-      localStorage.setItem(cookieConsentKey, 'accept');
+      setCookieConsent('accept');
       banner.classList.add('hidden');
       // Immediately detect location and update time display
       detectUserTimeFromLocation();
     });
 
     rejectBtn.addEventListener('click', () => {
-      localStorage.setItem(cookieConsentKey, 'reject');
+      setCookieConsent('reject');
       banner.classList.add('hidden');
     });
   }
@@ -859,7 +941,7 @@
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
     // Only do IP lookup if consent is given
-    const cookieConsent = localStorage.getItem(cookieConsentKey);
+    const cookieConsent = getCookieConsent();
     if (cookieConsent === 'accept') {
       // Defer to next tick so this function returns immediately
       Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});

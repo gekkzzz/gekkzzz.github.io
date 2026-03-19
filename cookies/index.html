@@ -90,7 +90,7 @@
           </div>
 
           <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--meta-color);">
-            Your choice is stored locally in your browser and never leaves your device. You can change it anytime by returning to this page.
+            Your choice is stored locally in your browser (consent cookie + local storage mirror) and never leaves your device. You can change it anytime by returning to this page.
           </p>
 
           <div class="section-head" style="margin-top: 2rem;">
@@ -113,8 +113,91 @@
 
   <script>
     // Cookie preference management for the policy page
+    const cookieConsentKey = 'gekkzzz-cookie-consent';
+
+    function normalizeConsentValue(value) {
+      return value === 'accept' || value === 'reject' ? value : null;
+    }
+
+    function getCookieValue(name) {
+      const encodedName = encodeURIComponent(name);
+      const prefix = `${encodedName}=`;
+      const cookieParts = document.cookie ? document.cookie.split('; ') : [];
+
+      for (const cookiePart of cookieParts) {
+        if (!cookiePart.startsWith(prefix)) continue;
+        return decodeURIComponent(cookiePart.slice(prefix.length));
+      }
+
+      return null;
+    }
+
+    function setCookieValue(name, value, maxAgeSeconds) {
+      const encodedName = encodeURIComponent(name);
+      const encodedValue = encodeURIComponent(value);
+      const maxAge = Number.isFinite(maxAgeSeconds)
+        ? Math.max(0, Math.floor(maxAgeSeconds))
+        : 0;
+
+      document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax`;
+    }
+
+    function getLocalConsent() {
+      try {
+        return normalizeConsentValue(window.localStorage.getItem(cookieConsentKey));
+      } catch {
+        return null;
+      }
+    }
+
+    function setLocalConsent(value) {
+      try {
+        window.localStorage.setItem(cookieConsentKey, value);
+      } catch {
+        // Ignore storage failures and rely on the cookie value.
+      }
+    }
+
+    function clearLocalConsent() {
+      try {
+        window.localStorage.removeItem(cookieConsentKey);
+      } catch {
+        // Ignore storage failures.
+      }
+    }
+
+    function getConsent() {
+      const consentFromCookie = normalizeConsentValue(getCookieValue(cookieConsentKey));
+      const consentFromStorage = getLocalConsent();
+
+      if (!consentFromCookie && consentFromStorage) {
+        clearLocalConsent();
+        return null;
+      }
+
+      if (consentFromCookie && consentFromStorage !== consentFromCookie) {
+        setLocalConsent(consentFromCookie);
+      }
+
+      return consentFromCookie;
+    }
+
+    function setConsent(value) {
+      const consent = normalizeConsentValue(value);
+      const oneYearInSeconds = 60 * 60 * 24 * 365;
+
+      if (!consent) {
+        setCookieValue(cookieConsentKey, '', 0);
+        clearLocalConsent();
+        return;
+      }
+
+      setCookieValue(cookieConsentKey, consent, oneYearInSeconds);
+      setLocalConsent(consent);
+    }
+
     function updateCookieStatus() {
-      const consent = localStorage.getItem('gekkzzz-cookie-consent');
+      const consent = getConsent();
       const statusEl = document.getElementById('cookie-status');
       
       if (!statusEl) return;
@@ -136,14 +219,14 @@
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', () => {
-        localStorage.setItem('gekkzzz-cookie-consent', 'accept');
+        setConsent('accept');
         updateCookieStatus();
       });
     }
 
     if (rejectBtn) {
       rejectBtn.addEventListener('click', () => {
-        localStorage.setItem('gekkzzz-cookie-consent', 'reject');
+        setConsent('reject');
         updateCookieStatus();
       });
     }
