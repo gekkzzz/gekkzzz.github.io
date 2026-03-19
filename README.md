@@ -21,6 +21,7 @@ This site serves as a central landing page: somewhere to find out who I am, see 
 - Visitor timezone is detected via `ipwho.is` with a browser `Intl` fallback.
 - If a city is detected, the label updates to show the visitor's location.
 - Time and location providers are easy to tweak in `assets/js/site.js`.
+- Run `node scripts/check-timezones.js` to verify timezone parsing against supported IANA zones, legacy aliases, and common UTC offset formats.
 
 ### GitHub contribution calendar
 - Renders a custom contribution graph — no embedded image or third-party widget.

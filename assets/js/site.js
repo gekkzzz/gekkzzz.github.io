@@ -21,7 +21,7 @@
   let hasShownLoaderDone = false;
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
-  let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  let userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
   const activityRefreshIntervalMs = 60 * 60 * 1000;
@@ -37,6 +37,220 @@
     timeZone: 'UTC'
   });
   const msPerDay = 24 * 60 * 60 * 1000;
+  const timezoneAliases = {
+    'africa/asmera': 'Africa/Asmara',
+    'africa/timbuktu': 'Africa/Bamako',
+    'america/atka': 'America/Adak',
+    'america/buenos_aires': 'America/Argentina/Buenos_Aires',
+    'america/catamarca': 'America/Argentina/Catamarca',
+    'america/cordoba': 'America/Argentina/Cordoba',
+    'america/fort_wayne': 'America/Indiana/Indianapolis',
+    'america/indianapolis': 'America/Indiana/Indianapolis',
+    'america/jujuy': 'America/Argentina/Jujuy',
+    'america/knox_in': 'America/Indiana/Knox',
+    'america/louisville': 'America/Kentucky/Louisville',
+    'america/mendoza': 'America/Argentina/Mendoza',
+    'america/porto_acre': 'America/Rio_Branco',
+    'america/rosario': 'America/Argentina/Cordoba',
+    'america/shiprock': 'America/Denver',
+    'asia/ashkhabad': 'Asia/Ashgabat',
+    'asia/calcutta': 'Asia/Kolkata',
+    'asia/chongqing': 'Asia/Shanghai',
+    'asia/chungking': 'Asia/Shanghai',
+    'asia/dacca': 'Asia/Dhaka',
+    'asia/harbin': 'Asia/Shanghai',
+    'asia/katmandu': 'Asia/Kathmandu',
+    'asia/ujung_pandang': 'Asia/Makassar',
+    'asia/macao': 'Asia/Macau',
+    'asia/rangoon': 'Asia/Yangon',
+    'asia/saigon': 'Asia/Ho_Chi_Minh',
+    'asia/tel_aviv': 'Asia/Jerusalem',
+    'asia/thimbu': 'Asia/Thimphu',
+    'asia/ulan_bator': 'Asia/Ulaanbaatar',
+    'asia/kashgar': 'Asia/Urumqi',
+    'atlantic/faeroe': 'Atlantic/Faroe',
+    'australia/act': 'Australia/Sydney',
+    'australia/canberra': 'Australia/Sydney',
+    'australia/lhi': 'Australia/Lord_Howe',
+    'australia/nsw': 'Australia/Sydney',
+    'australia/north': 'Australia/Darwin',
+    'australia/queensland': 'Australia/Brisbane',
+    'australia/south': 'Australia/Adelaide',
+    'australia/tasmania': 'Australia/Hobart',
+    'australia/victoria': 'Australia/Melbourne',
+    'australia/west': 'Australia/Perth',
+    'australia/yancowinna': 'Australia/Broken_Hill',
+    'brazil/acre': 'America/Rio_Branco',
+    'brazil/denoronha': 'America/Noronha',
+    'brazil/east': 'America/Sao_Paulo',
+    'brazil/west': 'America/Manaus',
+    'canada/atlantic': 'America/Halifax',
+    'canada/central': 'America/Winnipeg',
+    'canada/eastern': 'America/Toronto',
+    'canada/mountain': 'America/Edmonton',
+    'canada/newfoundland': 'America/St_Johns',
+    'canada/pacific': 'America/Vancouver',
+    'europe/belfast': 'Europe/London',
+    'europe/kiev': 'Europe/Kyiv',
+    'europe/tiraspol': 'Europe/Chisinau',
+    'europe/uzhgorod': 'Europe/Kyiv',
+    'europe/zaporozhye': 'Europe/Kyiv',
+    'mexico/bajanorte': 'America/Tijuana',
+    'mexico/bajasur': 'America/Mazatlan',
+    'mexico/general': 'America/Mexico_City',
+    'pacific/johnston': 'Pacific/Honolulu',
+    'pacific/ponape': 'Pacific/Pohnpei',
+    'pacific/samoa': 'Pacific/Pago_Pago',
+    'pacific/truk': 'Pacific/Chuuk',
+    'pacific/yap': 'Pacific/Chuuk',
+    'us/alaska': 'America/Anchorage',
+    'us/aleutian': 'America/Adak',
+    'us/arizona': 'America/Phoenix',
+    'us/central': 'America/Chicago',
+    'us/east-indiana': 'America/Indiana/Indianapolis',
+    'us/eastern': 'America/New_York',
+    'us/hawaii': 'Pacific/Honolulu',
+    'us/indiana-starke': 'America/Indiana/Knox',
+    'us/michigan': 'America/Detroit',
+    'us/mountain': 'America/Denver',
+    'us/pacific': 'America/Los_Angeles',
+    'us/samoa': 'Pacific/Pago_Pago',
+    'etc/greenwich': 'Etc/GMT',
+    'etc/uct': 'Etc/UTC',
+    'etc/universal': 'Etc/UTC',
+    'etc/zulu': 'Etc/UTC',
+    'gmt0': 'Etc/GMT',
+    'greenwich': 'Etc/GMT',
+    'hongkong': 'Asia/Hong_Kong',
+    'iceland': 'Atlantic/Reykjavik',
+    'iran': 'Asia/Tehran',
+    'israel': 'Asia/Jerusalem',
+    'jamaica': 'America/Jamaica',
+    'japan': 'Asia/Tokyo',
+    'kwajalein': 'Pacific/Kwajalein',
+    'libya': 'Africa/Tripoli',
+    'nz': 'Pacific/Auckland',
+    'nz-chat': 'Pacific/Chatham',
+    'poland': 'Europe/Warsaw',
+    'portugal': 'Europe/Lisbon',
+    'prc': 'Asia/Shanghai',
+    'roc': 'Asia/Taipei',
+    'singapore': 'Asia/Singapore',
+    'turkey': 'Europe/Istanbul',
+    'w-su': 'Europe/Moscow'
+  };
+  const offsetTimezoneFallbacks = {
+    '+0330': 'Asia/Tehran',
+    '+0430': 'Asia/Kabul',
+    '+0530': 'Asia/Kolkata',
+    '+0545': 'Asia/Kathmandu',
+    '+0630': 'Asia/Yangon',
+    '+0845': 'Australia/Eucla',
+    '+0930': 'Australia/Darwin',
+    '+1030': 'Australia/Lord_Howe',
+    '+1245': 'Pacific/Chatham',
+    '-0330': 'America/St_Johns'
+  };
+  const supportedTimezoneMaps = (() => {
+    if (typeof Intl.supportedValuesOf !== 'function') return null;
+
+    try {
+      const byLower = new Map();
+      const byCompact = new Map();
+      const byCityCompact = new Map();
+      const supportedZones = Intl.supportedValuesOf('timeZone');
+
+      for (const zone of supportedZones) {
+        const lowerZone = zone.toLowerCase();
+        const compactZone = lowerZone.replace(/[^a-z0-9]/g, '');
+        const zoneParts = lowerZone.split('/');
+        const cityPart = zoneParts[zoneParts.length - 1] || '';
+        const compactCity = cityPart.replace(/[^a-z0-9]/g, '');
+
+        byLower.set(lowerZone, zone);
+
+        if (!byCompact.has(compactZone)) {
+          byCompact.set(compactZone, zone);
+        }
+
+        if (compactCity) {
+          if (!byCityCompact.has(compactCity)) {
+            byCityCompact.set(compactCity, zone);
+          } else if (byCityCompact.get(compactCity) !== zone) {
+            byCityCompact.set(compactCity, null);
+          }
+        }
+      }
+
+      return { byLower, byCompact, byCityCompact };
+    } catch {
+      return null;
+    }
+  })();
+
+  function getCompactTimezoneKey(value) {
+    return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function normalizeTimezoneToken(value) {
+    return value
+      .replace(/\s*\/\s*/g, '/')
+      .replace(/\s+/g, '_')
+      .trim();
+  }
+
+  function parseUtcOffsetTimezone(rawTimezone) {
+    if (typeof rawTimezone !== 'string') return null;
+
+    const trimmed = rawTimezone.trim();
+    if (!trimmed) return null;
+
+    const utcMatch = trimmed.match(/^(?:UTC|GMT)?\s*([+-])\s*(\d{1,2})(?::?(\d{2}))?$/i);
+    if (!utcMatch) {
+      if (/^(?:UTC|GMT|Z)$/i.test(trimmed)) {
+        return 'UTC';
+      }
+
+      return null;
+    }
+
+    const sign = utcMatch[1];
+    const hours = Number(utcMatch[2]);
+    const minutes = Number(utcMatch[3] || '0');
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes) || hours > 14 || minutes > 59) {
+      return null;
+    }
+
+    const offsetKey = `${sign}${String(hours).padStart(2, '0')}${String(minutes).padStart(2, '0')}`;
+    if (minutes !== 0) {
+      return offsetTimezoneFallbacks[offsetKey] || null;
+    }
+
+    if (hours === 0) {
+      return 'Etc/GMT';
+    }
+
+    const etcSign = sign === '+' ? '-' : '+';
+    return `Etc/GMT${etcSign}${hours}`;
+  }
+
+  function getTimezoneTokens(timezone) {
+    if (typeof timezone !== 'string') return [];
+
+    const strippedTimezone = timezone
+      .replace(/\((?:[^)(]|\([^)(]*\))*\)/g, ' ')
+      .trim();
+
+    if (!strippedTimezone) return [];
+
+    const parts = strippedTimezone
+      .split(/[|,;]/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    return parts.length > 0 ? parts : [strippedTimezone];
+  }
 
   function setLoaderSkipForNextNavigation() {
     try {
@@ -443,23 +657,75 @@
     }
   }
 
-  function isValidTimezone(timezone) {
-    if (!timezone) return false;
+  function getCanonicalTimezone(timezone) {
+    const timezoneTokens = getTimezoneTokens(timezone);
 
-    try {
-      new Intl.DateTimeFormat('en-GB', { timeZone: timezone }).format(new Date());
-      return true;
-    } catch {
-      return false;
+    for (const token of timezoneTokens) {
+      const normalizedToken = normalizeTimezoneToken(token);
+      if (!normalizedToken) continue;
+
+      const timezoneCandidates = [];
+      const addCandidate = (candidate) => {
+        if (!candidate) return;
+        if (!timezoneCandidates.includes(candidate)) {
+          timezoneCandidates.push(candidate);
+        }
+      };
+
+      addCandidate(normalizedToken);
+
+      const aliasTimezone = timezoneAliases[normalizedToken.toLowerCase()];
+      addCandidate(aliasTimezone);
+
+      const offsetTimezone = parseUtcOffsetTimezone(token);
+      addCandidate(offsetTimezone);
+
+      if (supportedTimezoneMaps) {
+        for (const candidate of timezoneCandidates) {
+          const directMatch = supportedTimezoneMaps.byLower.get(candidate.toLowerCase());
+          if (directMatch) return directMatch;
+        }
+
+        for (const candidate of timezoneCandidates) {
+          const compactMatch = supportedTimezoneMaps.byCompact.get(getCompactTimezoneKey(candidate));
+          if (compactMatch) return compactMatch;
+        }
+
+        if (!normalizedToken.includes('/')) {
+          const cityMatch = supportedTimezoneMaps.byCityCompact.get(getCompactTimezoneKey(normalizedToken));
+          if (cityMatch) return cityMatch;
+        }
+      }
+
+      for (const candidate of timezoneCandidates) {
+        try {
+          const resolvedTimezone = new Intl.DateTimeFormat('en-GB', { timeZone: candidate })
+            .resolvedOptions()
+            .timeZone;
+          return resolvedTimezone || candidate;
+        } catch {
+          // Try next candidate.
+        }
+      }
     }
+
+    return null;
+  }
+
+  function isValidTimezone(timezone) {
+    return Boolean(getCanonicalTimezone(timezone));
   }
 
   function normalizeLocationPayload(payload) {
     if (!payload || payload.success === false) return null;
 
-    const timezone = payload.timezone
-      ? (typeof payload.timezone === 'string' ? payload.timezone : payload.timezone.id)
+    const payloadTimezone = payload.timezone || payload.timeZone || payload.time_zone || payload.tz;
+    const rawTimezone = payloadTimezone
+      ? (typeof payloadTimezone === 'string'
+        ? payloadTimezone
+        : payloadTimezone.id || payloadTimezone.name || payloadTimezone.timezone || payloadTimezone.value)
       : null;
+    const timezone = getCanonicalTimezone(rawTimezone);
 
     const city = payload.city || null;
     const countryCode = payload.country_code
@@ -505,7 +771,9 @@
         const data = normalizeLocationPayload(payload);
         if (!data) continue;
 
-        if (isValidTimezone(data.timezone)) {
+        const hasValidTimezone = Boolean(data.timezone);
+
+        if (hasValidTimezone) {
           userTimezone = data.timezone;
         }
 
@@ -518,7 +786,7 @@
           yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
         }
 
-        if (isValidTimezone(data.timezone) || locationBits.length > 0) {
+        if (hasValidTimezone || locationBits.length > 0) {
           break;
         }
       } catch {
