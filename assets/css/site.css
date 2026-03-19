@@ -342,6 +342,7 @@ a {
 
 .post-list li a {
   color: var(--link-color);
+  font-size: 0.85rem;
 }
 
 .post-list li a:hover {
@@ -720,6 +721,7 @@ a:hover {
 
 .post-list li {
   display: flex;
+  align-items: flex-start;
   margin-bottom: 1.1rem;
   font-size: 1rem;
 }
@@ -755,6 +757,7 @@ a:hover {
   display: inline-block;
   width: 7rem;
   margin-right: 0.6rem;
+  padding-top: 0.25rem;
   color: var(--meta-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
