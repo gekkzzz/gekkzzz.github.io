@@ -262,6 +262,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  align-self: flex-end;
   gap: 0.5rem;
 }
 
@@ -752,6 +753,8 @@ a:hover {
   font-size: 0.72rem;
   line-height: 1.2;
 }
+
+
 
 .post-date {
   display: inline-block;
