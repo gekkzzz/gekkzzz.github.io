@@ -13,7 +13,6 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 | Home | `index.html` | Live clocks, timezone/location-aware visitor time, GitHub activity calendar, latest blog posts, resource links |
 | About | `about/index.html` | Profile, personal background, likes/dislikes tags, work focus |
 | Contact | `contact/index.html` | Contact channels for LinkedIn, GitHub, Substack, and email |
-| Shop | `shop/index.html` | Stripe-powered product listing and checkout via Pricing Table |
 | Cookie Policy | `cookies/index.html` | Cookie consent explanation, IP lookup details, preference management |
 | Secret | `secret/index.html` | Hidden retro Pong game |
 
@@ -106,8 +105,6 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 ├── about/
 │   └── index.html
 ├── contact/
-│   └── index.html
-├── shop/
 │   └── index.html
 ├── cookies/
 │   └── index.html
