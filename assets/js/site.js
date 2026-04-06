@@ -2,6 +2,7 @@
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
   const myTimeElement = document.getElementById('my-time');
+  const myTimezoneElement = document.getElementById('my-timezone');
   const yourTimeElement = document.getElementById('your-time');
   const yourTimezoneElement = document.getElementById('your-timezone');
   const yourTimeLabelElement = document.getElementById('your-time-label');
@@ -23,6 +24,7 @@
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
   let userTimezone = 'UTC'; // Will be detected later after getCanonicalTimezone is defined
+  let userLocation = null;
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
   const activityRefreshIntervalMs = 60 * 60 * 1000;
@@ -794,6 +796,103 @@
     }
   }
 
+  function getTimezoneOffsetMinutes(date, timezone) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: timezone,
+        hour12: false,
+        hourCycle: 'h23',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }).formatToParts(date);
+      const values = Object.create(null);
+
+      for (const part of parts) {
+        if (part.type !== 'literal') {
+          values[part.type] = part.value;
+        }
+      }
+
+      const zonedTimestamp = Date.UTC(
+        Number(values.year),
+        Number(values.month) - 1,
+        Number(values.day),
+        Number(values.hour),
+        Number(values.minute),
+        Number(values.second)
+      );
+
+      return Math.round((zonedTimestamp - date.getTime()) / 60000);
+    } catch {
+      return 0;
+    }
+  }
+
+  function formatTimeDifference(date, referenceTimezone, comparisonTimezone) {
+    const differenceInMinutes = getTimezoneOffsetMinutes(date, comparisonTimezone)
+      - getTimezoneOffsetMinutes(date, referenceTimezone);
+
+    if (!Number.isFinite(differenceInMinutes) || differenceInMinutes === 0) {
+      return 'Same as Liverpool';
+    }
+
+    const absoluteMinutes = Math.abs(differenceInMinutes);
+    const hours = Math.floor(absoluteMinutes / 60);
+    const minutes = absoluteMinutes % 60;
+    const durationParts = [];
+
+    if (hours > 0) {
+      durationParts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
+    }
+
+    if (minutes > 0) {
+      durationParts.push(`${minutes} min${minutes === 1 ? '' : 's'}`);
+    }
+
+    const sign = differenceInMinutes > 0 ? '+' : '-';
+    const direction = differenceInMinutes > 0 ? 'ahead of Liverpool' : 'behind Liverpool';
+    return `${sign}${durationParts.join(' ')} ${direction}`;
+  }
+
+  function getFallbackLocationLabel(timezone) {
+    const canonicalTimezone = getCanonicalTimezone(timezone);
+    if (!canonicalTimezone) {
+      return 'Local device';
+    }
+
+    const timezoneParts = canonicalTimezone.split('/');
+    const cityName = timezoneParts[timezoneParts.length - 1]?.replace(/_/g, ' ');
+    return cityName || canonicalTimezone;
+  }
+
+  function updateTimeMetadata() {
+    const now = new Date();
+    const locationBits = [userLocation?.city, userLocation?.countryCode || userLocation?.country].filter(Boolean);
+    const locationLabel = locationBits.length > 0
+      ? locationBits.join(', ')
+      : getFallbackLocationLabel(userTimezone);
+    const differenceLabel = formatTimeDifference(now, ukTimezone, userTimezone);
+
+    if (myTimezoneElement) {
+      myTimezoneElement.textContent = `${ukTimezone} · local time`;
+    }
+
+    if (yourTimeLabelElement) {
+      yourTimeLabelElement.textContent = locationLabel
+        ? `Your time (${locationLabel})`
+        : 'Your time';
+    }
+
+    if (yourTimezoneElement) {
+      const metadataBits = [userTimezone, differenceLabel].filter(Boolean);
+      yourTimezoneElement.textContent = metadataBits.join(' · ');
+    }
+  }
+
   function getCanonicalTimezone(timezone) {
     const timezoneTokens = getTimezoneTokens(timezone);
 
@@ -888,13 +987,11 @@
     if (yourTimeElement) {
       yourTimeElement.textContent = formatClockTime(now, userTimezone);
     }
+
+    updateTimeMetadata();
   }
 
   async function detectUserTimeFromLocation() {
-    // Surface immediate fallback copy while location APIs resolve.
-    if (yourTimezoneElement) {
-      yourTimezoneElement.textContent = 'Local device';
-    }
     renderTimeSection();
 
     const locationEndpoints = [
@@ -918,15 +1015,16 @@
         }
 
         const locationBits = [data.city, data.countryCode || data.country].filter(Boolean);
-        if (yourTimezoneElement && locationBits.length > 0) {
-          yourTimezoneElement.textContent = locationBits.join(', ');
-        }
-
-        if (yourTimeLabelElement && locationBits.length > 0) {
-          yourTimeLabelElement.textContent = `Your time (${locationBits.join(', ')})`;
+        if (locationBits.length > 0) {
+          userLocation = {
+            city: data.city || null,
+            countryCode: data.countryCode || null,
+            country: data.country || null
+          };
         }
 
         if (hasValidTimezone || locationBits.length > 0) {
+          renderTimeSection();
           break;
         }
       } catch {
