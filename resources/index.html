@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources - gekkzzz</title>
+  <link rel="icon" type="image/png" href="../assets/images/avatar.png">
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="is-site-loading">
+  <div class="page-loader" id="page-loader" aria-hidden="true">
+    <div class="loader-shell">
+      <p class="activity-update-note loader-note">Loading</p>
+      <div class="loader-slot">
+        <div class="loader" aria-hidden="true"></div>
+        <h2 class="section-title loader-done">DONE!</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <a class="corner-avatar-link" href="/secret" title="ooo, a secret!" aria-label="Open the secret Pong page">
+      <img class="corner-avatar" src="../assets/images/avatar.png" alt="Avatar">
+    </a>
+
+    <div class="container">
+      <header class="hero">
+        <div>
+          <h1 class="site-title">gekkzzz</h1>
+          <div class="available-badge">
+            <span class="status-dot"></span>
+            <span class="available-text">Available For Work</span>
+          </div>
+          <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
+        </div>
+
+        <nav class="hero-links">
+          <a href="/">Home</a>
+          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
+          <a href="/about">About</a>
+          <a href="/work">My Work</a>
+          <a href="/resources">Resources</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      <main>
+
+        <section class="posts">
+          <div class="section-head">
+            <h2 class="section-title">Free Learning Resources</h2>
+          </div>
+          <p class="resource-page-intro">High-quality, genuinely free resources for learning full-stack web development.</p>
+
+          <h3>Full Curricula</h3>
+          <ul class="learning-resources-list">
+            <li>
+              <a href="https://www.theodinproject.com/dashboard" target="_blank" rel="noopener">The Odin Project</a>
+              <span class="resource-desc">A project-driven, open-source curriculum covering the full stack from HTML to Node.js. Widely considered the best free path for beginners.</span>
+            </li>
+            <li>
+              <a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener">freeCodeCamp</a>
+              <span class="resource-desc">Structured certifications spanning responsive design, JavaScript, front-end libraries, APIs, data visualisation, and more. Earns you verifiable certificates.</span>
+            </li>
+            <li>
+              <a href="https://fullstackopen.com/en/" target="_blank" rel="noopener">Full Stack Open</a>
+              <span class="resource-desc">University of Helsinki's deep-dive course covering React, Node, GraphQL, TypeScript, and testing. Industry-respected and completely free.</span>
+            </li>
+            <li>
+              <a href="https://cs50.harvard.edu/web/" target="_blank" rel="noopener">CS50W (Harvard)</a>
+              <span class="resource-desc">Harvard's free Web Programming course using Python, JavaScript, and SQL. Rigorous, structured, and comes with a verifiable certificate.</span>
+            </li>
+          </ul>
+
+          <h3>References & Guides</h3>
+          <ul class="learning-resources-list">
+            <li>
+              <a href="https://developer.mozilla.org/en-US/" target="_blank" rel="noopener">MDN Web Docs</a>
+              <span class="resource-desc">The definitive reference for HTML, CSS, and JavaScript. If you bookmark one thing, make it this.</span>
+            </li>
+            <li>
+              <a href="https://javascript.info/" target="_blank" rel="noopener">JavaScript.info</a>
+              <span class="resource-desc">A thorough, modern guide to JavaScript from first principles to advanced topics like prototypes, async, and modules. Exceptionally well-written.</span>
+            </li>
+            <li>
+              <a href="https://web.dev/learn" target="_blank" rel="noopener">Web Dev (Chrome)</a>
+              <span class="resource-desc">Google's structured learning paths on performance, accessibility, CSS, HTML, forms, and modern web APIs.</span>
+            </li>
+          </ul>
+
+          <h3>Visual & Interactive</h3>
+          <ul class="learning-resources-list">
+            <li>
+              <a href="https://andreasbm.github.io/web-skills/" target="_blank" rel="noopener">Web Skills</a>
+              <span class="resource-desc">An interactive visual map of everything involved in web development, with links to learning resources for each topic. Great for understanding the landscape.</span>
+            </li>
+            <li>
+              <a href="https://roadmap.sh" target="_blank" rel="noopener">roadmap.sh</a>
+              <span class="resource-desc">Community-maintained learning roadmaps for front-end, back-end, full-stack, DevOps, and more. Helpful for knowing what to learn next.</span>
+            </li>
+          </ul>
+
+          <h3>Patterns & Architecture</h3>
+          <ul class="learning-resources-list">
+            <li>
+              <a href="https://www.patterns.dev/#patterns" target="_blank" rel="noopener">Patterns.dev</a>
+              <span class="resource-desc">Design and rendering patterns for modern JavaScript and React. Covers everything from singleton and observer to streaming SSR and islands architecture.</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="posts" style="margin-top: 2.75rem;">
+          <div class="section-head checklist-top-head">
+            <h2 class="section-title">Pre-Launch Checklist</h2>
+            <button class="checklist-reset-btn" id="reset-all-btn" type="button">Reset All</button>
+          </div>
+          <div class="checklist-confirm" id="checklist-confirm" hidden>
+            <span class="checklist-confirm-text">Are you sure you want to reset progress?</span>
+            <div class="checklist-confirm-actions">
+              <button class="checklist-confirm-btn checklist-confirm-yes" id="confirm-yes-btn" type="button">Yes, reset</button>
+              <button class="checklist-confirm-btn checklist-confirm-no" id="confirm-no-btn" type="button">Cancel</button>
+            </div>
+          </div>
+
+          <p class="resource-page-intro">Work through this before you ship. Check items off as you go &mdash; your progress is saved in the browser.</p>
+
+          <div class="checklist-total-progress">
+            <div class="checklist-total-label">
+              <span class="checklist-total-text">Overall Progress</span>
+              <span class="checklist-total-count" id="total-count">0 / 0</span>
+            </div>
+            <div class="checklist-total-bar">
+              <div class="checklist-total-fill" id="total-fill"></div>
+            </div>
+          </div>
+
+          <div class="checklist-section" data-section="s0">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">1. Planning &amp; Setup</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-0"><label for="chk-s0-0">Project requirements and scope are documented</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-1"><label for="chk-s0-1">Git repository initialised with a meaningful commit history</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-2"><label for="chk-s0-2">.gitignore configured to exclude node_modules, .env files, and build artefacts</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-3"><label for="chk-s0-3">Linter and formatter configured (ESLint + Prettier or equivalent)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-4"><label for="chk-s0-4">.env.example committed with placeholder values &mdash; never real secrets</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-5"><label for="chk-s0-5">Dependencies are reasonably up to date</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s0-6"><label for="chk-s0-6">README describes how to run the project locally</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s1">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">2. HTML &amp; Accessibility</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-0"><label for="chk-s1-0">Semantic HTML structure used (header, main, footer, nav, article, section)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-1"><label for="chk-s1-1">Correct heading hierarchy: one h1 per page, no skipped levels</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-2"><label for="chk-s1-2">All images have descriptive alt attributes (empty alt="" for decorative images)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-3"><label for="chk-s1-3">Form inputs are associated with visible labels</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-4"><label for="chk-s1-4">All interactive elements are reachable and operable by keyboard alone</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-5"><label for="chk-s1-5">Focus styles are visible &mdash; not removed with outline: none without a replacement</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-6"><label for="chk-s1-6">ARIA roles and attributes used correctly where native HTML is insufficient</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-7"><label for="chk-s1-7">lang attribute set on the &lt;html&gt; element</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-8"><label for="chk-s1-8">Viewport meta tag present</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s1-9"><label for="chk-s1-9">Page passes a basic screen reader check (headings, landmarks, interactive elements announced)</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s2">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">3. CSS &amp; Design</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-0"><label for="chk-s2-0">Fully responsive on mobile, tablet, and desktop</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-1"><label for="chk-s2-1">No horizontal scroll at any screen width</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-2"><label for="chk-s2-2">Colour contrast meets WCAG AA (4.5:1 for normal text, 3:1 for large text)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-3"><label for="chk-s2-3">Body font size is at least 16px or equivalent</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-4"><label for="chk-s2-4">Touch targets are at least 44&times;44px on mobile</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-5"><label for="chk-s2-5">Animations and transitions respect prefers-reduced-motion</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-6"><label for="chk-s2-6">No large blocks of dead or unused CSS left in production</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s2-7"><label for="chk-s2-7">Dark mode supported or a deliberate decision made against it</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s3">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">4. JavaScript</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-0"><label for="chk-s3-0">No console errors in the browser on the production build</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-1"><label for="chk-s3-1">No debug console.log statements left in production code</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-2"><label for="chk-s3-2">No use of eval() or Function() with dynamic strings</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-3"><label for="chk-s3-3">Async operations handle both success and failure paths</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-4"><label for="chk-s3-4">No unhandled promise rejections</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-5"><label for="chk-s3-5">Event listeners are removed when no longer needed to avoid memory leaks</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-6"><label for="chk-s3-6">User input is validated client-side before submission</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s3-7"><label for="chk-s3-7">Bundled and minified for production (if using a bundler)</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s4">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">5. TypeScript (if applicable)</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-0"><label for="chk-s4-0">strict mode enabled in tsconfig.json</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-1"><label for="chk-s4-1">No any types except where genuinely unavoidable (and documented with a comment)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-2"><label for="chk-s4-2">All functions have typed parameters and explicit return types</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-3"><label for="chk-s4-3">Third-party library types installed (@types/* packages)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-4"><label for="chk-s4-4">tsc --noEmit passes with zero errors</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s4-5"><label for="chk-s4-5">Enums or union types used instead of magic strings</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s5">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">6. React (if applicable)</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-0"><label for="chk-s5-0">All list renders include a stable, unique key prop</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-1"><label for="chk-s5-1">No direct DOM mutations &mdash; state and refs used instead</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-2"><label for="chk-s5-2">useEffect hooks have correct dependency arrays</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-3"><label for="chk-s5-3">Effects that set up subscriptions or timers clean up on unmount</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-4"><label for="chk-s5-4">Components are small and focused on one concern</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-5"><label for="chk-s5-5">Prop types or TypeScript interfaces defined for all components</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-6"><label for="chk-s5-6">No unnecessary re-renders (React DevTools Profiler checked)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s5-7"><label for="chk-s5-7">Error boundaries in place around critical UI sections</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s6">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">7. Node.js / Backend (if applicable)</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-0"><label for="chk-s6-0">All incoming data is validated and sanitised before use</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-1"><label for="chk-s6-1">Rate limiting configured on public-facing endpoints</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-2"><label for="chk-s6-2">CORS configured with an explicit origin allowlist &mdash; not a wildcard *</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-3"><label for="chk-s6-3">Security headers set (Helmet.js or manual: CSP, HSTS, X-Frame-Options, X-Content-Type-Options)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-4"><label for="chk-s6-4">Global error-handling middleware returns generic messages in production &mdash; no stack traces exposed</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-5"><label for="chk-s6-5">Structured logging configured &mdash; not console.log in production</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-6"><label for="chk-s6-6">Health check endpoint available (/health or equivalent)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-7"><label for="chk-s6-7">Graceful shutdown handles in-flight requests before exiting</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s6-8"><label for="chk-s6-8">Process manager or container restart policy configured (PM2, systemd, Docker restart)</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s7">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">8. Databases &amp; SQL</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-0"><label for="chk-s7-0">All queries use parameterised statements &mdash; never string interpolation with user input</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-1"><label for="chk-s7-1">Database credentials are in environment variables, not in source code</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-2"><label for="chk-s7-2">Migrations are version-controlled and reversible</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-3"><label for="chk-s7-3">Indexes exist on columns used in WHERE clauses and JOIN conditions</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-4"><label for="chk-s7-4">Connection pooling configured &mdash; not a new connection per request</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-5"><label for="chk-s7-5">Sensitive data (passwords, tokens, PII) is encrypted at rest</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-6"><label for="chk-s7-6">Automated backups configured and tested with a restore drill</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s7-7"><label for="chk-s7-7">Least-privilege principle: app database user has only the permissions it needs</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s8">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">9. APIs &amp; Third-Party Integrations</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-0"><label for="chk-s8-0">All API keys and secrets are in environment variables &mdash; never in source code or client-side bundles</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-1"><label for="chk-s8-1">External API responses are validated and typed before being used or stored</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-2"><label for="chk-s8-2">Timeouts configured on all outbound HTTP requests</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-3"><label for="chk-s8-3">Retry logic with backoff handles transient failures gracefully</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-4"><label for="chk-s8-4">Incoming webhooks validate the signature before processing the payload</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-5"><label for="chk-s8-5">API error responses do not expose internal implementation details or stack traces</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s8-6"><label for="chk-s8-6">Third-party SDK versions pinned in the lockfile to avoid supply chain drift</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s9">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">10. Security</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-0"><label for="chk-s9-0">No API keys, passwords, or secrets committed anywhere in the git history (run git log and git grep)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-1"><label for="chk-s9-1">HTTPS enforced; no mixed HTTP/HTTPS content on the page</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-2"><label for="chk-s9-2">Content Security Policy (CSP) header configured</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-3"><label for="chk-s9-3">XSS prevention: user content rendered as text, never injected as raw HTML</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-4"><label for="chk-s9-4">CSRF protection on all state-changing requests (POST, PUT, DELETE, PATCH)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-5"><label for="chk-s9-5">Authentication required before any user data is accessible; authorisation checked per resource</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-6"><label for="chk-s9-6">Passwords hashed with a strong algorithm: bcrypt, Argon2, or scrypt</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-7"><label for="chk-s9-7">Session tokens and JWTs stored in httpOnly cookies, not localStorage</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-8"><label for="chk-s9-8">npm audit (or equivalent) run &mdash; high and critical vulnerabilities resolved</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-9"><label for="chk-s9-9">No exposed debug endpoints, admin panels, or test routes in production</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-10"><label for="chk-s9-10">File uploads validated by MIME type and size; stored outside the web root</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-11"><label for="chk-s9-11">Sensitive user data (passwords, tokens, PII) is never written to logs</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s9-12"><label for="chk-s9-12">Dependency lockfile (package-lock.json or yarn.lock) committed to the repository</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s10">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">11. Performance</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-0"><label for="chk-s10-0">Images compressed and served in a modern format (WebP or AVIF)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-1"><label for="chk-s10-1">Images have explicit width and height attributes to prevent layout shift (CLS)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-2"><label for="chk-s10-2">Below-the-fold images use loading="lazy"</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-3"><label for="chk-s10-3">JavaScript bundles are code-split and tree-shaken; dead code eliminated</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-4"><label for="chk-s10-4">Caching headers (Cache-Control) configured correctly for static assets</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-5"><label for="chk-s10-5">No render-blocking resources &mdash; scripts deferred or loaded async</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-6"><label for="chk-s10-6">Core Web Vitals measured and in an acceptable range: LCP, INP, and CLS</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s10-7"><label for="chk-s10-7">CDN configured for static assets where applicable</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s11">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">12. Testing</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-0"><label for="chk-s11-0">Unit tests cover critical business logic</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-1"><label for="chk-s11-1">Integration tests cover API routes and database interactions</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-2"><label for="chk-s11-2">End-to-end tests cover the primary user flows</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-3"><label for="chk-s11-3">All tests pass on a clean run with no environment-specific workarounds</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-4"><label for="chk-s11-4">Edge cases and error paths are tested, not just the happy path</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-5"><label for="chk-s11-5">No .only, .skip, or xit left in the test suite</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s11-6"><label for="chk-s11-6">Tests run in CI and block merges on failure</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s12">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">13. SEO &amp; Meta</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-0"><label for="chk-s12-0">Unique, descriptive &lt;title&gt; on every page (under 60 characters)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-1"><label for="chk-s12-1">Meta description on every page (under 160 characters)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-2"><label for="chk-s12-2">Open Graph tags set: og:title, og:description, og:image, og:url</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-3"><label for="chk-s12-3">Twitter / X card tags set</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-4"><label for="chk-s12-4">Canonical URL set on each page</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-5"><label for="chk-s12-5">robots.txt present and correctly configured</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-6"><label for="chk-s12-6">sitemap.xml generated and submitted to search engines</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-7"><label for="chk-s12-7">Structured data / JSON-LD added where relevant (articles, products, FAQs)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s12-8"><label for="chk-s12-8">Favicon and app icons provided in appropriate sizes</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s13">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">14. Deployment &amp; DevOps</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-0"><label for="chk-s13-0">All environment variables set in production &mdash; not relying on a committed .env file</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-1"><label for="chk-s13-1">Production build runs without errors or warnings</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-2"><label for="chk-s13-2">CI/CD pipeline configured; deployments are automated and repeatable</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-3"><label for="chk-s13-3">Staging environment tested and signed off before production deploy</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-4"><label for="chk-s13-4">Rollback plan documented and tested</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-5"><label for="chk-s13-5">Custom domain configured with a valid SSL certificate (auto-renewing)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-6"><label for="chk-s13-6">Custom 404 and 500 error pages configured</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s13-7"><label for="chk-s13-7">CI uses the lockfile (npm ci instead of npm install) for reproducible installs</label></li>
+            </ul>
+          </div>
+
+          <div class="checklist-section" data-section="s14">
+            <div class="checklist-section-header">
+              <span class="checklist-section-title">15. Monitoring &amp; Maintenance</span>
+              <span class="checklist-count"></span>
+            </div>
+            <div class="checklist-progress-bar"><div class="checklist-progress-fill"></div></div>
+            <ul class="checklist-list">
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-0"><label for="chk-s14-0">Error tracking configured (Sentry, Bugsnag, or equivalent)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-1"><label for="chk-s14-1">Uptime monitoring in place with alerts (UptimeRobot, Better Uptime, etc.)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-2"><label for="chk-s14-2">Application logs are centralised and searchable</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-3"><label for="chk-s14-3">Alerts configured for critical errors and performance degradation</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-4"><label for="chk-s14-4">Analytics configured (privacy-respecting where possible &mdash; Plausible, Fathom, or equivalent)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-5"><label for="chk-s14-5">Dependency updates scheduled or automated (Dependabot, Renovate)</label></li>
+              <li class="checklist-item"><input type="checkbox" id="chk-s14-6"><label for="chk-s14-6">Privacy policy and cookie notice in place if collecting any user data</label></li>
+            </ul>
+          </div>
+
+        </section>
+      </main>
+
+      <footer>
+        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies" style="border: none;">Cookie Policy</a></p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../assets/js/site.js"></script>
+  <script>
+    const CHECKLIST_KEY = 'launch-checklist-v1';
+
+    function allCheckboxes() {
+      return document.querySelectorAll('.checklist-item input[type="checkbox"]');
+    }
+
+    function persist() {
+      const state = {};
+      allCheckboxes().forEach(cb => { state[cb.id] = cb.checked; });
+      try { localStorage.setItem(CHECKLIST_KEY, JSON.stringify(state)); } catch (_) {}
+    }
+
+    function restore() {
+      try {
+        const raw = localStorage.getItem(CHECKLIST_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        Object.entries(state).forEach(([id, checked]) => {
+          const cb = document.getElementById(id);
+          if (cb) cb.checked = checked;
+        });
+      } catch (_) {}
+    }
+
+    function refreshSection(sectionEl) {
+      const boxes = sectionEl.querySelectorAll('input[type="checkbox"]');
+      const total = boxes.length;
+      const done = Array.from(boxes).filter(cb => cb.checked).length;
+      const fill = sectionEl.querySelector('.checklist-progress-fill');
+      const count = sectionEl.querySelector('.checklist-count');
+      if (fill) fill.style.width = total ? `${(done / total) * 100}%` : '0%';
+      if (count) count.textContent = `${done} / ${total}`;
+    }
+
+    function refreshTotal() {
+      const boxes = allCheckboxes();
+      const total = boxes.length;
+      const done = Array.from(boxes).filter(cb => cb.checked).length;
+      const fill = document.getElementById('total-fill');
+      const count = document.getElementById('total-count');
+      if (fill) fill.style.width = total ? `${(done / total) * 100}%` : '0%';
+      if (count) count.textContent = `${done} / ${total}`;
+    }
+
+    function refreshAll() {
+      document.querySelectorAll('.checklist-section').forEach(refreshSection);
+      refreshTotal();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      restore();
+      refreshAll();
+
+      allCheckboxes().forEach(cb => {
+        cb.addEventListener('change', () => {
+          persist();
+          const section = cb.closest('.checklist-section');
+          if (section) refreshSection(section);
+          refreshTotal();
+        });
+      });
+
+      const resetBtn = document.getElementById('reset-all-btn');
+      const confirmBox = document.getElementById('checklist-confirm');
+      const confirmYes = document.getElementById('confirm-yes-btn');
+      const confirmNo = document.getElementById('confirm-no-btn');
+
+      function showConfirm() {
+        resetBtn.hidden = true;
+        confirmBox.hidden = false;
+      }
+
+      function hideConfirm() {
+        confirmBox.hidden = true;
+        resetBtn.hidden = false;
+      }
+
+      if (resetBtn) resetBtn.addEventListener('click', showConfirm);
+
+      if (confirmYes) {
+        confirmYes.addEventListener('click', () => {
+          allCheckboxes().forEach(cb => { cb.checked = false; });
+          persist();
+          refreshAll();
+          hideConfirm();
+        });
+      }
+
+      if (confirmNo) confirmNo.addEventListener('click', hideConfirm);
+    });
+  </script>
+</body>
+</html>
