@@ -23,7 +23,7 @@
   let hasShownLoaderDone = false;
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
-  let userTimezone = 'UTC'; // Will be detected later after getCanonicalTimezone is defined
+  let userTimezone = 'UTC';
   let userLocation = null;
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
@@ -258,9 +258,7 @@
   function setLoaderSkipForNextNavigation() {
     try {
       window.sessionStorage.setItem(loaderSkipNavigationKey, '1');
-    } catch {
-      // Ignore storage failures and keep loader functional.
-    }
+    } catch {}
   }
 
   function consumeLoaderSkipForNavigation() {
@@ -315,17 +313,13 @@
   function setLocalCookieConsent(value) {
     try {
       window.localStorage.setItem(cookieConsentKey, value);
-    } catch {
-      // Ignore storage failures; cookie remains source of truth.
-    }
+    } catch {}
   }
 
   function clearLocalCookieConsent() {
     try {
       window.localStorage.removeItem(cookieConsentKey);
-    } catch {
-      // Ignore storage failures.
-    }
+    } catch {}
   }
 
   function getCookieConsent() {
@@ -333,7 +327,6 @@
     const consentFromStorage = getLocalCookieConsent();
 
     if (!consentFromCookie && consentFromStorage) {
-      // If consent cookie is missing, treat consent as reset and clear stale local storage.
       clearLocalCookieConsent();
       return null;
     }
@@ -436,7 +429,6 @@
         pageLoaderElement.parentElement.removeChild(pageLoaderElement);
       }
 
-      // Show cookie banner after loader is hidden if consent not yet given
       const cookieConsent = getCookieConsent();
       if (!cookieConsent && (myTimeElement || yourTimeElement)) {
         showCookieBanner();
@@ -472,7 +464,6 @@
     acceptBtn.addEventListener('click', () => {
       setCookieConsent('accept');
       banner.classList.add('hidden');
-      // Immediately detect location and update time display
       detectUserTimeFromLocation();
     });
 
@@ -512,8 +503,6 @@
   const shouldRunPageLoader = Boolean(pageLoaderElement) && !shouldSkipLoaderForInternalNavigation;
 
   if (shouldRunPageLoader) {
-
-    // Prevent the loader from getting stuck if onload does not fire as expected.
     window.setTimeout(startPageLoaderFinish, maxLoaderDurationMs);
 
     if (document.readyState === 'complete') {
@@ -939,9 +928,7 @@
             .resolvedOptions()
             .timeZone;
           return resolvedTimezone || candidate;
-        } catch {
-          // Try next candidate.
-        }
+        } catch {}
       }
     }
 
@@ -952,7 +939,6 @@
     return Boolean(getCanonicalTimezone(timezone));
   }
 
-  // Initialize user timezone from device now that getCanonicalTimezone is available
   userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
 
   function normalizeLocationPayload(payload) {
@@ -1027,9 +1013,7 @@
           renderTimeSection();
           break;
         }
-      } catch {
-        // Try the next provider if this one fails.
-      }
+      } catch {}
     }
 
     renderTimeSection();
@@ -1038,10 +1022,8 @@
   if (myTimeElement || yourTimeElement) {
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
-    // Only do IP lookup if consent is given
     const cookieConsent = getCookieConsent();
     if (cookieConsent === 'accept') {
-      // Defer to next tick so this function returns immediately
       Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
     }
   }
@@ -1078,13 +1060,11 @@
   }
 
   if (calendar) {
-    // Defer to next tick so this function returns immediately
     Promise.resolve().then(() => refreshActivityCalendar()).catch(() => {});
     scheduleActivityRefreshOnTheHour();
   }
 
   if (list) {
-    // Defer to next tick so this function returns immediately
     Promise.resolve().then(async () => {
       try {
         const rssUrl = 'https://gekkzzz.substack.com/feed';

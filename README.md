@@ -1,6 +1,6 @@
-# gekkzzz.github.io
+﻿# gekkzzz.github.io
 
-Personal portfolio and blog hub for gekkzzz.
+Personal portfolio and blog hub for gekkzzz. Hosted on [Vercel](https://vercel.com).
 
 This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScript. No framework. No build step. No package install required for normal local development.
 
@@ -9,9 +9,11 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 ### Core pages
 
 | Page | Path | What it contains |
-|------|------|------------------|
+| --- | --- | --- |
 | Home | `index.html` | Live clocks, timezone/location-aware visitor time, GitHub activity calendar, latest blog posts, resource links |
 | About | `about/index.html` | Profile, personal background, likes/dislikes tags, work focus |
+| Work | `work/index.html` | Portfolio of projects and work experience |
+| Resources | `resources/index.html` | Free full-stack learning resources and a pre-launch checklist |
 | Contact | `contact/index.html` | Contact channels for LinkedIn, GitHub, Substack, and email |
 | Cookie Policy | `cookies/index.html` | Cookie consent explanation, IP lookup details, preference management |
 | Secret | `secret/index.html` | Hidden retro Pong game |
@@ -21,11 +23,11 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 - Shared header/nav layout and visual style.
 - Fixed avatar shortcut button.
 - Intro page loader with a staged completion flow:
-	- loading animation
-	- finish acceleration
-	- full bar state
-	- DONE state
-	- fade out
+  - loading animation
+  - finish acceleration
+  - full bar state
+  - DONE state
+  - fade out
 - Loader skip on internal navigation (uses `sessionStorage` to avoid replaying the full loader between internal page transitions).
 - **Cookie consent banner** (appears after loader completes if user hasn't chosen a preference).
 - Responsive behavior for desktop/mobile breakpoints.
@@ -36,32 +38,45 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 ### Home page feature details
 
 - **Dual live clocks**
-	- "My Time (Liverpool, GB)" uses `Europe/London`.
-	- "Your time" updates every second.
+  - "My Time (Liverpool, GB)" uses `Europe/London`.
+  - "Your time" updates every second.
 - **Timezone detection with robust fallback**
-	- Starts from browser timezone.
-	- Optionally enriches timezone/location via `ipwho.is` and `ipinfo.io`.
-	- Includes timezone normalization and alias handling.
-	- Supports offset-based inputs like `UTC+5`, `GMT+05:30`, etc.
+  - Starts from browser timezone.
+  - Optionally enriches timezone/location via `ipwho.is` and `ipinfo.io`.
+  - Includes timezone normalization and alias handling.
+  - Supports offset-based inputs like `UTC+5`, `GMT+05:30`, etc.
 - **Custom GitHub activity calendar renderer**
-	- Pulls yearly contribution data.
-	- Rebuilds a GitHub-style contribution grid in the DOM.
-	- Recomputes contribution levels for visual scaling.
-	- Refreshes automatically every hour (aligned to top of hour).
+  - Pulls yearly contribution data.
+  - Rebuilds a GitHub-style contribution grid in the DOM.
+  - Recomputes contribution levels for visual scaling.
+  - Refreshes automatically every hour (aligned to top of hour).
 - **Latest blog posts feed**
-	- Reads Substack RSS feed.
-	- Converts via `rss2json` endpoint for browser-friendly JSON.
-	- Safely escapes content and validates links.
-	- Shows graceful fallback text if feed is unavailable.
+  - Reads Substack RSS feed.
+  - Fetches via `allorigins.win` proxy and parses the XML response.
+  - Safely escapes content and validates links.
+  - Shows graceful fallback text if feed is unavailable.
 
 ### About page feature details
 
 - Profile intro and personal metadata.
 - Likes and dislikes displayed as reusable tag chips.
 - Structured narrative sections:
-	- About Me
-	- What I Do
-	- When I'm Not Working
+  - About Me
+  - What I Do
+  - When I'm Not Working
+
+### Resources page feature details
+
+- **Free full-stack learning resources** — curated, genuinely free links organised by category:
+  - *Full Curricula* — The Odin Project, freeCodeCamp, Full Stack Open (University of Helsinki), CS50W (Harvard)
+  - *References & Guides* — MDN Web Docs, JavaScript.info, web.dev
+  - *Visual & Interactive* — Web Skills, roadmap.sh
+  - *Patterns & Architecture* — Patterns.dev
+- **Pre-launch checklist** — a comprehensive, browser-persisted checklist covering 15 topic areas:
+  - Planning & Setup, HTML & Accessibility, CSS & Design, JavaScript, TypeScript, React, Node.js / Backend, Databases & SQL, APIs & Third-Party Integrations, Security, Performance, Testing, SEO & Meta, Deployment & DevOps, Monitoring & Maintenance
+  - Check items off as you go — progress saves to `localStorage`.
+  - Per-section progress bars and an overall progress indicator.
+  - Reset button with a confirmation step to avoid accidental clears.
 
 ### Contact page feature details
 
@@ -72,15 +87,15 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 
 - Retro-styled Pong implementation in pure canvas JavaScript.
 - Input support:
-	- Keyboard (`W/S`, `Arrow Up/Down`, `Space` to serve)
-	- Mouse move
-	- Touch drag/tap (pointer events)
+  - Keyboard (`W/S`, `Arrow Up/Down`, `Space` to serve)
+  - Mouse move
+  - Touch drag/tap (pointer events)
 - Game logic includes:
-	- CPU paddle AI tracking
-	- collision/bounce angle calculations
-	- scoring to 10
-	- restart/serve loop
-	- CRT-style scanline effect
+  - CPU paddle AI tracking
+  - collision/bounce angle calculations
+  - scoring to 10
+  - restart/serve loop
+  - CRT-style scanline effect
 
 ### Cookie consent system
 
@@ -104,6 +119,10 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 ├── index.html
 ├── about/
 │   └── index.html
+├── work/
+│   └── index.html
+├── resources/
+│   └── index.html
 ├── contact/
 │   └── index.html
 ├── cookies/
@@ -113,16 +132,14 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
 ├── assets/
 │   ├── css/
 │   │   └── site.css
+│   ├── docs/
+│   │   └── CV.pdf
 │   ├── images/
 │   │   └── avatar.png
 │   └── js/
 │       └── site.js
-├── scripts/
-│   └── check-timezones.js
-├── .github/
-│   └── workflows/
-│       └── deploy-pages.yml
-└── .nojekyll
+└── scripts/
+    └── check-timezones.js
 ```
 
 ## Run locally
@@ -298,15 +315,23 @@ Add a link to your cookie policy in the footer of all pages:
 <p class="footer-legal">...<a href="/cookies" style="border: none;">Cookie Policy</a></p>
 ```
 
+### 8) Reuse the pre-launch checklist
+
+1. Copy the checklist markup from `resources/index.html` (`.checklist-section` blocks).
+2. Copy checklist styles from `assets/css/site.css` (`.checklist-*` classes).
+3. Copy the inline checklist script from `resources/index.html` — it handles localStorage persistence, per-section progress bars, and the reset flow.
+4. Change `CHECKLIST_KEY` to a unique string for your site to avoid collisions.
+
 ## Common customization checklist
 
 After cloning/forking, most people update these first:
 
-1. Replace text content in `index.html`, `about/index.html`, and `contact/index.html`.
+1. Replace text content in `index.html`, `about/index.html`, `work/index.html`, and `contact/index.html`.
 2. Replace `assets/images/avatar.png`.
 3. Update external profile/blog/contact links.
 4. Update `activityUsername` and Substack feed URL in `assets/js/site.js`.
 5. Tweak theme colors in `:root` variables in `assets/css/site.css`.
+6. Update or extend the learning resources in `resources/index.html` to suit your audience.
 
 ## Third-party endpoints used client-side
 
@@ -314,18 +339,20 @@ The browser-side script can call:
 
 - `https://github-contributions-api.jogruber.de` (activity data)
 - `https://ipwho.is` and `https://ipinfo.io` (timezone/location enrichment — **only if user accepts cookies**)
-- `https://api.rss2json.com` + your feed source (blog posts)
+- `https://api.allorigins.win/raw` + your feed source URL (blog posts)
 
 If you want a fully self-contained site, remove or replace these fetch calls.
 
 ## Deployment
 
-Every push to `main` (or `master`) triggers `.github/workflows/deploy-pages.yml` and deploys the repository root to GitHub Pages.
+This site is deployed on **Vercel**. Every push to `main` triggers an automatic production deployment.
 
-### One-time GitHub Pages setup
+### One-time Vercel setup
 
-1. Open repository **Settings -> Pages**.
-2. Set **Source** to **GitHub Actions**.
-3. Save.
+1. Import the repository at [vercel.com/new](https://vercel.com/new).
+2. Leave build settings at their defaults — no build command or output directory is needed for a plain HTML site.
+3. Vercel assigns a `.vercel.app` domain automatically; configure a custom domain in **Project Settings → Domains**.
 
-`.nojekyll` ensures static files are served directly without Jekyll processing.
+### Running locally
+
+Use Python or VS Code Live Server (see [Run locally](#run-locally) above). No Vercel CLI is required for day-to-day development.

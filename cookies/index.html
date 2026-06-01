@@ -114,7 +114,6 @@
   <script src="../assets/js/site.js"></script>
 
   <script>
-    // Cookie preference management for the policy page
     const cookieConsentKey = 'gekkzzz-cookie-consent';
 
     function normalizeConsentValue(value) {
@@ -155,17 +154,13 @@
     function setLocalConsent(value) {
       try {
         window.localStorage.setItem(cookieConsentKey, value);
-      } catch {
-        // Ignore storage failures and rely on the cookie value.
-      }
+      } catch {}
     }
 
     function clearLocalConsent() {
       try {
         window.localStorage.removeItem(cookieConsentKey);
-      } catch {
-        // Ignore storage failures.
-      }
+      } catch {}
     }
 
     function getConsent() {
@@ -233,7 +228,6 @@
       });
     }
 
-    // Initialize status on page load
     updateCookieStatus();
   </script>
 </body>
