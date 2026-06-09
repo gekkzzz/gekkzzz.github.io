@@ -64,7 +64,6 @@ This project is intentionally lightweight: plain HTML, CSS, and vanilla JavaScri
   - *References & Guides* — MDN Web Docs, JavaScript.info, web.dev
   - *Visual & Interactive* — Web Skills, roadmap.sh
   - *Patterns & Architecture* — Patterns.dev
-  - *Specifications & Standards* — specification.website
 - **Pre-launch checklist** — a comprehensive, browser-persisted checklist covering **17 sections**:
   - Planning & Setup, HTML & Accessibility, CSS & Design, JavaScript, TypeScript, React, Node.js / Backend, Databases & SQL, APIs & Third-Party Integrations, Security, Performance, Testing, SEO & Meta, Deployment & DevOps, Monitoring & Maintenance, Agent Readiness, Resilience
   - Each item is tagged: **Required**, **Recommended**, **Optional**, or **Avoid**.
