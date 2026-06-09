@@ -299,7 +299,8 @@
       ? Math.max(0, Math.floor(maxAgeSeconds))
       : 0;
 
-    document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax`;
+    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
   }
 
   function getLocalCookieConsent() {
@@ -1064,37 +1065,55 @@
     scheduleActivityRefreshOnTheHour();
   }
 
-  if (list) {
-    Promise.resolve().then(async () => {
+  async function fetchFeedItems() {
+    const rssUrl = 'https://gekkzzz.substack.com/feed';
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`,
+      `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
+    ];
+
+    for (const proxyUrl of proxies) {
       try {
-        const rssUrl = 'https://gekkzzz.substack.com/feed';
-        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error('fetch failed');
+        const controller = new AbortController();
+        const tid = window.setTimeout(() => controller.abort(), 8000);
+        const res = await fetch(proxyUrl, { signal: controller.signal });
+        window.clearTimeout(tid);
+        if (!res.ok) continue;
         const text = await res.text();
         const xml = new DOMParser().parseFromString(text, 'text/xml');
+        if (xml.querySelector('parsererror')) continue;
         const items = Array.from(xml.getElementsByTagName('item')).slice(0, 3);
+        if (items.length === 0) continue;
+        return items;
+      } catch {}
+    }
+    return null;
+  }
 
-        if (items.length === 0) {
+  if (list) {
+    (async () => {
+      try {
+        const items = await fetchFeedItems();
+        if (!items) {
           list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
           return;
         }
-
         list.innerHTML = items.map(item => {
-          const title = item.getElementsByTagName('title')[0]?.textContent || '';
-          const link = item.getElementsByTagName('link')[0]?.textContent
-            || item.getElementsByTagName('guid')[0]?.textContent || '';
+          const title = item.getElementsByTagName('title')[0]?.textContent?.trim() || '';
+          const link = item.getElementsByTagName('link')[0]?.textContent?.trim()
+            || item.getElementsByTagName('guid')[0]?.textContent?.trim() || '';
           const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
-          return `
-          <li>
+          return `<li>
             <span class="post-date">${escapeHtml(formatDate(pubDate))}</span>
             <a href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a>
-          </li>
-        `;
+          </li>`;
         }).join('');
       } catch {
         list.innerHTML = '<li class="post-empty">Nothing to see yet&hellip;</li>';
       }
-    }).catch(() => {});
+    })();
   }
+
+  window.siteGetCookieConsent = getCookieConsent;
+  window.siteSetCookieConsent = setCookieConsent;
 })();

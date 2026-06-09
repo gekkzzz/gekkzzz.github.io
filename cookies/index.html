@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body class="is-site-loading">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <div class="page-loader" id="page-loader" aria-hidden="true">
     <div class="loader-shell">
       <p class="activity-update-note loader-note">Loading</p>
@@ -27,10 +28,10 @@
       <header class="hero">
         <div>
           <h1 class="site-title">Cookie Policy</h1>
-          <p class="eyebrow">Transparency & Your Control</p>
+          <p class="eyebrow">Transparency &amp; Your Control</p>
         </div>
 
-        <nav class="hero-links">
+        <nav class="hero-links" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
           <a href="/about">About</a>
@@ -40,7 +41,7 @@
         </nav>
       </header>
 
-      <main>
+      <main id="main-content">
         <section class="posts cookie-policy">
           <div class="section-head">
             <h2 class="section-title">What cookies do I use?</h2>
@@ -88,11 +89,11 @@
               <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept Location Lookup</button>
               <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject Location Lookup</button>
             </div>
-            <p id="cookie-status" class="cookie-status-message" style="margin-top: 1rem; text-align: center;"></p>
+            <p id="cookie-status" class="cookie-status-message"></p>
           </div>
 
-          <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--meta-color);">
-            Your choice is stored locally in your browser (consent cookie + local storage mirror) and never leaves your device. You can change it anytime by returning to this page.
+          <p class="cookie-policy-note">
+            Your choice is stored locally in your browser and never leaves your device. You can change it anytime by returning to this page.
           </p>
 
           <div class="section-head" style="margin-top: 2rem;">
@@ -114,96 +115,17 @@
   <script src="../assets/js/site.js"></script>
 
   <script>
-    const cookieConsentKey = 'gekkzzz-cookie-consent';
-
-    function normalizeConsentValue(value) {
-      return value === 'accept' || value === 'reject' ? value : null;
-    }
-
-    function getCookieValue(name) {
-      const encodedName = encodeURIComponent(name);
-      const prefix = `${encodedName}=`;
-      const cookieParts = document.cookie ? document.cookie.split('; ') : [];
-
-      for (const cookiePart of cookieParts) {
-        if (!cookiePart.startsWith(prefix)) continue;
-        return decodeURIComponent(cookiePart.slice(prefix.length));
-      }
-
-      return null;
-    }
-
-    function setCookieValue(name, value, maxAgeSeconds) {
-      const encodedName = encodeURIComponent(name);
-      const encodedValue = encodeURIComponent(value);
-      const maxAge = Number.isFinite(maxAgeSeconds)
-        ? Math.max(0, Math.floor(maxAgeSeconds))
-        : 0;
-
-      document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax`;
-    }
-
-    function getLocalConsent() {
-      try {
-        return normalizeConsentValue(window.localStorage.getItem(cookieConsentKey));
-      } catch {
-        return null;
-      }
-    }
-
-    function setLocalConsent(value) {
-      try {
-        window.localStorage.setItem(cookieConsentKey, value);
-      } catch {}
-    }
-
-    function clearLocalConsent() {
-      try {
-        window.localStorage.removeItem(cookieConsentKey);
-      } catch {}
-    }
-
-    function getConsent() {
-      const consentFromCookie = normalizeConsentValue(getCookieValue(cookieConsentKey));
-      const consentFromStorage = getLocalConsent();
-
-      if (!consentFromCookie && consentFromStorage) {
-        clearLocalConsent();
-        return null;
-      }
-
-      if (consentFromCookie && consentFromStorage !== consentFromCookie) {
-        setLocalConsent(consentFromCookie);
-      }
-
-      return consentFromCookie;
-    }
-
-    function setConsent(value) {
-      const consent = normalizeConsentValue(value);
-      const oneYearInSeconds = 60 * 60 * 24 * 365;
-
-      if (!consent) {
-        setCookieValue(cookieConsentKey, '', 0);
-        clearLocalConsent();
-        return;
-      }
-
-      setCookieValue(cookieConsentKey, consent, oneYearInSeconds);
-      setLocalConsent(consent);
-    }
-
     function updateCookieStatus() {
-      const consent = getConsent();
       const statusEl = document.getElementById('cookie-status');
-      
       if (!statusEl) return;
 
+      const consent = window.siteGetCookieConsent ? window.siteGetCookieConsent() : null;
+
       if (consent === 'accept') {
-        statusEl.textContent = '✓ You have accepted location lookup. The site will enrich your timezone display.';
+        statusEl.textContent = 'You have accepted location lookup. The site will enrich your timezone display.';
         statusEl.style.color = 'var(--status-color)';
       } else if (consent === 'reject') {
-        statusEl.textContent = '✗ You have rejected location lookup. Your time will be based on your computer\'s timezone only.';
+        statusEl.textContent = 'You have rejected location lookup. Your time will be based on your computer\'s timezone only.';
         statusEl.style.color = 'var(--meta-color)';
       } else {
         statusEl.textContent = 'No preference set. The consent banner will appear on the home page.';
@@ -216,14 +138,14 @@
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', () => {
-        setConsent('accept');
+        if (window.siteSetCookieConsent) window.siteSetCookieConsent('accept');
         updateCookieStatus();
       });
     }
 
     if (rejectBtn) {
       rejectBtn.addEventListener('click', () => {
-        setConsent('reject');
+        if (window.siteSetCookieConsent) window.siteSetCookieConsent('reject');
         updateCookieStatus();
       });
     }

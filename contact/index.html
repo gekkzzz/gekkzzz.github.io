@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body class="is-site-loading">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <div class="page-loader" id="page-loader" aria-hidden="true">
     <div class="loader-shell">
       <p class="activity-update-note loader-note">Loading</p>
@@ -28,23 +29,23 @@
         <div>
           <h1 class="site-title">gekkzzz</h1>
           <div class="available-badge">
-            <span class="status-dot"></span>
+            <span class="status-dot" aria-hidden="true"></span>
             <span class="available-text">Available For Work</span>
           </div>
           <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
         </div>
 
-        <nav class="hero-links">
+        <nav class="hero-links" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
           <a href="/about">About</a>
           <a href="/work">My Work</a>
           <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
+          <a href="/contact" aria-current="page">Contact</a>
         </nav>
       </header>
 
-      <main>
+      <main id="main-content">
         <section class="posts">
           <div class="section-head">
             <h2 class="section-title">Contact</h2>
@@ -66,7 +67,7 @@
       </main>
 
       <footer>
-        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies" style="border: none;">Cookie Policy</a></p>
+        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
       </footer>
     </div>
   </div>
