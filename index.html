@@ -247,53 +247,11 @@
     </main>
 
     <footer>
-      <p>&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
+      <p>&copy; 2026 gekkzzz. All rights reserved. &mdash; Your IP is used to show local time and weather. No data is stored by this site.</p>
     </footer>
-  </div>
-
-  <!-- Cookie banner -->
-  <div class="cookie-banner" id="cookie-banner" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-describedby="cookie-banner-desc">
-    <p id="cookie-banner-desc">
-      This site uses your IP address to show your local time and location. No data is stored by this site.
-      <a href="/cookies">Cookie Policy</a>
-    </p>
-    <div class="cookie-banner-actions">
-      <button class="cookie-btn cookie-btn-accept" id="cookie-accept" type="button">Accept</button>
-      <button class="cookie-btn cookie-btn-reject" id="cookie-reject" type="button">Reject</button>
-    </div>
   </div>
 
   <script src="assets/js/site.js"></script>
   <script src="assets/js/animations.js"></script>
-  <script>
-    (function () {
-      var CONSENT_KEY = 'gekkzzz-cookie-consent';
-      var banner = document.getElementById('cookie-banner');
-      var acceptBtn = document.getElementById('cookie-accept');
-      var rejectBtn = document.getElementById('cookie-reject');
-
-      function getConsent() {
-        try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
-      }
-
-      function setConsent(value) {
-        try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
-        if (banner) banner.classList.remove('is-visible');
-      }
-
-      if (!getConsent()) {
-        setTimeout(function () {
-          if (banner) banner.classList.add('is-visible');
-        }, 800);
-      }
-
-      if (acceptBtn) {
-        acceptBtn.addEventListener('click', function () { setConsent('accept'); });
-      }
-      if (rejectBtn) {
-        rejectBtn.addEventListener('click', function () { setConsent('reject'); });
-      }
-    })();
-  </script>
 </body>
 </html>

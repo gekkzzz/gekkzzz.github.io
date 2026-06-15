@@ -10,7 +10,6 @@ Plain HTML, CSS, and vanilla JavaScript — no framework, no build step, no pack
 | --- | --- | --- |
 | Home | `index.html` | Hero, stack, projects, live clocks, GitHub activity calendar, latest blog posts |
 | Contact | `contact/index.html` | GitHub, YouTube, Substack, and email links |
-| Cookie Policy | `cookies/index.html` | Privacy/data explanation, preference management |
 
 ## Features
 
@@ -60,18 +59,10 @@ Plain HTML, CSS, and vanilla JavaScript — no framework, no build step, no pack
 
 - **Latest blog posts** — reads Substack RSS via four CORS proxies with 8-second timeout per attempt and graceful fallback. Handles CDATA-wrapped titles.
 
-- **Cookie consent banner** — shown on all pages. Slides in after 800ms if no preference is set. Accept/Reject persist to `localStorage`.
-
 ### Contact page (`/contact`)
 
 - GitHub, YouTube, Substack, and email links.
-- Animation toggle and cookie policy link in the footer.
-
-### Cookie policy (`/cookies`)
-
-- Explains all third-party data flows: IP lookup, Open-Meteo weather, GitHub API, Substack RSS.
-- `localStorage` keys documented: `gekkzzz-cookie-consent`, `gekkzzz-theme`, `gekkzzz-anim-enabled`, `gekkzzz-anim-last`, `gekkzzz-anim-last-ts`.
-- Live accept/reject buttons to update preference at any time.
+- Footer notes that visitor IP is used for local time and weather display only — no data stored.
 
 ## Project structure
 
@@ -79,7 +70,6 @@ Plain HTML, CSS, and vanilla JavaScript — no framework, no build step, no pack
 .
 ├── index.html
 ├── contact/index.html
-├── cookies/index.html
 ├── robots.txt
 ├── sitemap.xml
 └── assets/

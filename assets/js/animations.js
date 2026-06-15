@@ -1,6 +1,6 @@
 (function () {
   // Grab the full-viewport background canvas injected in index.html.
-  // If the canvas is missing (e.g. on the contact/cookies pages) bail immediately.
+  // If the canvas is missing (e.g. on the contact page) bail immediately.
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
 

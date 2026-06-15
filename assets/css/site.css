@@ -83,8 +83,7 @@ html[data-theme="light"] {
   border-radius: 2px;
 }
 
-.theme-btn:focus-visible,
-.cookie-btn:focus-visible {
+.theme-btn:focus-visible {
   outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
@@ -672,130 +671,7 @@ section {
   z-index: 1;
 }
 
-/* ── COOKIE BANNER ────────────────────────────────────────────────────────────
-   Fixed bottom-centre consent dialog. Hidden by default (display:none) and
-   shown by adding .is-visible once JS determines no consent is stored. */
-.cookie-banner {
-  position: fixed;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 1rem 1.25rem;
-  max-width: 480px;
-  width: calc(100% - 2rem);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
-  font-size: 0.78rem;
-  color: var(--text-color);
-  flex-direction: column;
-  gap: 0.75rem;
-  display: none;
-}
-
-.cookie-banner.is-visible {
-  display: flex;
-}
-
-.cookie-banner p {
-  margin: 0;
-  line-height: 1.6;
-}
-
-.cookie-banner a {
-  color: var(--link-color);
-}
-
-.cookie-banner-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-/* Shared base for Accept / Reject buttons. */
-.cookie-btn {
-  font-family: inherit;
-  font-size: 0.75rem;
-  padding: 0.3rem 0.85rem;
-  border-radius: 3px;
-  cursor: pointer;
-  border: 1px solid var(--border-color);
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  line-height: 1.5;
-}
-
-/* Accept: filled with the link colour to draw the eye first. */
-.cookie-btn-accept {
-  background: var(--link-color);
-  color: var(--bg-color);
-  border-color: var(--link-color);
-  font-weight: 600;
-}
-
-.cookie-btn-accept:hover {
-  background: var(--link-hover);
-  border-color: var(--link-hover);
-}
-
-/* Reject: ghost style so it's visible but not as prominent. */
-.cookie-btn-reject {
-  background: transparent;
-  color: var(--meta-color);
-}
-
-.cookie-btn-reject:hover {
-  color: var(--heading-color);
-  border-color: var(--heading-color);
-}
-
-/* ── COOKIE POLICY PAGE ───────────────────────────────────────────────────────
-   Styles for the /cookies page prose and the interactive preference box. */
-.cookie-policy-content h2 {
-  font-size: 0.82rem;
-  color: var(--heading-color);
-  font-weight: 700;
-  margin: 2rem 0 0.5rem;
-}
-
-.cookie-policy-content p,
-.cookie-policy-content li {
-  font-size: 0.85rem;
-  color: var(--text-color);
-  line-height: 1.7;
-}
-
-.cookie-policy-content ul {
-  padding-left: 1.5rem;
-  margin: 0.5rem 0;
-}
-
-/* Box on the cookies page that shows the visitor's current consent status. */
-.cookie-preference-box {
-  margin-top: 1rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--card-bg);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.cookie-preference-label {
-  font-size: 0.75rem;
-  color: var(--meta-color);
-}
-
-.cookie-preference-status {
-  font-size: 0.78rem;
-  color: var(--heading-color);
-  font-weight: 500;
-}
-
-/* ── FOOTER ───────────────────────────────────────────────────────────────────
-   Simple copyright line with a link to the cookie policy page. */
+/* ── FOOTER ───────────────────────────────────────────────────────────────── */
 footer {
   padding-top: 2rem;
   border-top: 1px solid var(--border-color);
