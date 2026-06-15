@@ -1,4 +1,62 @@
+(function () {
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  const THEME_KEY = 'gekkzzz-theme';
+
+  function applyTheme(preference) {
+    const root = document.documentElement;
+    if (preference === 'light') {
+      root.setAttribute('data-theme', 'light');
+    } else if (preference === 'dark') {
+      root.removeAttribute('data-theme');
+    } else {
+      // system
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        root.setAttribute('data-theme', 'light');
+      } else {
+        root.removeAttribute('data-theme');
+      }
+    }
+  }
+
+  function getSavedTheme() {
+    try { return localStorage.getItem(THEME_KEY) || 'dark'; } catch { return 'dark'; }
+  }
+
+  function saveTheme(preference) {
+    try { localStorage.setItem(THEME_KEY, preference); } catch {}
+  }
+
+  function updateThemeButtons(active) {
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === active);
+    });
+  }
+
+  // Apply before paint to avoid flash
+  applyTheme(getSavedTheme());
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const saved = getSavedTheme();
+    updateThemeButtons(saved);
+
+    document.querySelectorAll('.theme-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const preference = btn.dataset.theme;
+        saveTheme(preference);
+        applyTheme(preference);
+        updateThemeButtons(preference);
+      });
+    });
+
+    // Listen for system preference changes when set to "system"
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function () {
+      if (getSavedTheme() === 'system') applyTheme('system');
+    });
+  });
+})();
+
 (async function () {
+  // ── DOM refs ───────────────────────────────────────────────────────────────
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
   const myTimeElement = document.getElementById('my-time');
@@ -6,515 +64,275 @@
   const yourTimeElement = document.getElementById('your-time');
   const yourTimezoneElement = document.getElementById('your-timezone');
   const yourTimeLabelElement = document.getElementById('your-time-label');
-  const pageLoaderElement = document.getElementById('page-loader');
-  const loaderElement = pageLoaderElement ? pageLoaderElement.querySelector('.loader') : null;
-  const loaderSkipNavigationKey = 'gekkzzz.site-loader.skip-next-nav';
-  const cookieConsentKey = 'gekkzzz-cookie-consent';
-  const minLoaderDurationMs = 3000;
-  const maxLoaderDurationMs = 7000;
-  const loaderFadeDurationMs = 420;
-  const loaderFullHoldDurationMs = 1000;
-  const loaderDoneHoldDurationMs = 2000;
-  const loaderFinishTimeoutMs = 900;
-  const loaderStartTimestamp = Date.now();
-  let hasHiddenLoader = false;
-  let hasStartedLoaderFinish = false;
-  let hasStartedLoaderCompletion = false;
-  let hasShownLoaderDone = false;
+
+  // ── Constants ──────────────────────────────────────────────────────────────
   const ukTimezone = 'Europe/London';
   const timeTickIntervalMs = 1000;
-  let userTimezone = 'UTC';
-  let userLocation = null;
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
   const activityRefreshIntervalMs = 60 * 60 * 1000;
-  let isRefreshingActivity = false;
-  const monthFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    timeZone: 'UTC'
-  });
-  const accessibleDateFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC'
-  });
   const msPerDay = 24 * 60 * 60 * 1000;
+  const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
+  const accessibleDateFormatter = new Intl.DateTimeFormat('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+  });
+
+  let userTimezone = 'UTC';
+  let userLocation = null;
+  let isRefreshingActivity = false;
+
+  // ── Timezone aliases ───────────────────────────────────────────────────────
   const timezoneAliases = {
-    'africa/asmera': 'Africa/Asmara',
-    'africa/timbuktu': 'Africa/Bamako',
-    'america/atka': 'America/Adak',
-    'america/buenos_aires': 'America/Argentina/Buenos_Aires',
-    'america/catamarca': 'America/Argentina/Catamarca',
-    'america/cordoba': 'America/Argentina/Cordoba',
-    'america/fort_wayne': 'America/Indiana/Indianapolis',
-    'america/indianapolis': 'America/Indiana/Indianapolis',
-    'america/jujuy': 'America/Argentina/Jujuy',
-    'america/knox_in': 'America/Indiana/Knox',
-    'america/louisville': 'America/Kentucky/Louisville',
-    'america/mendoza': 'America/Argentina/Mendoza',
-    'america/porto_acre': 'America/Rio_Branco',
-    'america/rosario': 'America/Argentina/Cordoba',
-    'america/shiprock': 'America/Denver',
-    'asia/ashkhabad': 'Asia/Ashgabat',
-    'asia/calcutta': 'Asia/Kolkata',
-    'asia/chongqing': 'Asia/Shanghai',
-    'asia/chungking': 'Asia/Shanghai',
-    'asia/dacca': 'Asia/Dhaka',
-    'asia/harbin': 'Asia/Shanghai',
-    'asia/katmandu': 'Asia/Kathmandu',
-    'asia/ujung_pandang': 'Asia/Makassar',
-    'asia/macao': 'Asia/Macau',
-    'asia/rangoon': 'Asia/Yangon',
-    'asia/saigon': 'Asia/Ho_Chi_Minh',
-    'asia/tel_aviv': 'Asia/Jerusalem',
-    'asia/thimbu': 'Asia/Thimphu',
-    'asia/ulan_bator': 'Asia/Ulaanbaatar',
-    'asia/kashgar': 'Asia/Urumqi',
-    'atlantic/faeroe': 'Atlantic/Faroe',
-    'australia/act': 'Australia/Sydney',
-    'australia/canberra': 'Australia/Sydney',
-    'australia/lhi': 'Australia/Lord_Howe',
-    'australia/nsw': 'Australia/Sydney',
-    'australia/north': 'Australia/Darwin',
-    'australia/queensland': 'Australia/Brisbane',
-    'australia/south': 'Australia/Adelaide',
-    'australia/tasmania': 'Australia/Hobart',
-    'australia/victoria': 'Australia/Melbourne',
-    'australia/west': 'Australia/Perth',
-    'australia/yancowinna': 'Australia/Broken_Hill',
-    'brazil/acre': 'America/Rio_Branco',
-    'brazil/denoronha': 'America/Noronha',
-    'brazil/east': 'America/Sao_Paulo',
-    'brazil/west': 'America/Manaus',
-    'canada/atlantic': 'America/Halifax',
-    'canada/central': 'America/Winnipeg',
-    'canada/eastern': 'America/Toronto',
-    'canada/mountain': 'America/Edmonton',
-    'canada/newfoundland': 'America/St_Johns',
-    'canada/pacific': 'America/Vancouver',
-    'europe/belfast': 'Europe/London',
-    'europe/kiev': 'Europe/Kyiv',
-    'europe/tiraspol': 'Europe/Chisinau',
-    'europe/uzhgorod': 'Europe/Kyiv',
-    'europe/zaporozhye': 'Europe/Kyiv',
-    'mexico/bajanorte': 'America/Tijuana',
-    'mexico/bajasur': 'America/Mazatlan',
-    'mexico/general': 'America/Mexico_City',
-    'pacific/johnston': 'Pacific/Honolulu',
-    'pacific/ponape': 'Pacific/Pohnpei',
-    'pacific/samoa': 'Pacific/Pago_Pago',
-    'pacific/truk': 'Pacific/Chuuk',
-    'pacific/yap': 'Pacific/Chuuk',
-    'us/alaska': 'America/Anchorage',
-    'us/aleutian': 'America/Adak',
-    'us/arizona': 'America/Phoenix',
-    'us/central': 'America/Chicago',
-    'us/east-indiana': 'America/Indiana/Indianapolis',
-    'us/eastern': 'America/New_York',
-    'us/hawaii': 'Pacific/Honolulu',
-    'us/indiana-starke': 'America/Indiana/Knox',
-    'us/michigan': 'America/Detroit',
-    'us/mountain': 'America/Denver',
-    'us/pacific': 'America/Los_Angeles',
-    'us/samoa': 'Pacific/Pago_Pago',
-    'etc/greenwich': 'Etc/GMT',
-    'etc/uct': 'Etc/UTC',
-    'etc/universal': 'Etc/UTC',
-    'etc/zulu': 'Etc/UTC',
-    'gmt0': 'Etc/GMT',
-    'greenwich': 'Etc/GMT',
-    'hongkong': 'Asia/Hong_Kong',
-    'iceland': 'Atlantic/Reykjavik',
-    'iran': 'Asia/Tehran',
-    'israel': 'Asia/Jerusalem',
-    'jamaica': 'America/Jamaica',
-    'japan': 'Asia/Tokyo',
-    'kwajalein': 'Pacific/Kwajalein',
-    'libya': 'Africa/Tripoli',
-    'nz': 'Pacific/Auckland',
-    'nz-chat': 'Pacific/Chatham',
-    'poland': 'Europe/Warsaw',
-    'portugal': 'Europe/Lisbon',
-    'prc': 'Asia/Shanghai',
-    'roc': 'Asia/Taipei',
-    'singapore': 'Asia/Singapore',
-    'turkey': 'Europe/Istanbul',
+    'africa/asmera': 'Africa/Asmara', 'africa/timbuktu': 'Africa/Bamako',
+    'america/atka': 'America/Adak', 'america/buenos_aires': 'America/Argentina/Buenos_Aires',
+    'america/catamarca': 'America/Argentina/Catamarca', 'america/cordoba': 'America/Argentina/Cordoba',
+    'america/fort_wayne': 'America/Indiana/Indianapolis', 'america/indianapolis': 'America/Indiana/Indianapolis',
+    'america/jujuy': 'America/Argentina/Jujuy', 'america/knox_in': 'America/Indiana/Knox',
+    'america/louisville': 'America/Kentucky/Louisville', 'america/mendoza': 'America/Argentina/Mendoza',
+    'america/porto_acre': 'America/Rio_Branco', 'america/rosario': 'America/Argentina/Cordoba',
+    'america/shiprock': 'America/Denver', 'asia/ashkhabad': 'Asia/Ashgabat',
+    'asia/calcutta': 'Asia/Kolkata', 'asia/chongqing': 'Asia/Shanghai',
+    'asia/chungking': 'Asia/Shanghai', 'asia/dacca': 'Asia/Dhaka',
+    'asia/harbin': 'Asia/Shanghai', 'asia/katmandu': 'Asia/Kathmandu',
+    'asia/ujung_pandang': 'Asia/Makassar', 'asia/macao': 'Asia/Macau',
+    'asia/rangoon': 'Asia/Yangon', 'asia/saigon': 'Asia/Ho_Chi_Minh',
+    'asia/tel_aviv': 'Asia/Jerusalem', 'asia/thimbu': 'Asia/Thimphu',
+    'asia/ulan_bator': 'Asia/Ulaanbaatar', 'asia/kashgar': 'Asia/Urumqi',
+    'atlantic/faeroe': 'Atlantic/Faroe', 'australia/act': 'Australia/Sydney',
+    'australia/canberra': 'Australia/Sydney', 'australia/lhi': 'Australia/Lord_Howe',
+    'australia/nsw': 'Australia/Sydney', 'australia/north': 'Australia/Darwin',
+    'australia/queensland': 'Australia/Brisbane', 'australia/south': 'Australia/Adelaide',
+    'australia/tasmania': 'Australia/Hobart', 'australia/victoria': 'Australia/Melbourne',
+    'australia/west': 'Australia/Perth', 'australia/yancowinna': 'Australia/Broken_Hill',
+    'brazil/acre': 'America/Rio_Branco', 'brazil/denoronha': 'America/Noronha',
+    'brazil/east': 'America/Sao_Paulo', 'brazil/west': 'America/Manaus',
+    'canada/atlantic': 'America/Halifax', 'canada/central': 'America/Winnipeg',
+    'canada/eastern': 'America/Toronto', 'canada/mountain': 'America/Edmonton',
+    'canada/newfoundland': 'America/St_Johns', 'canada/pacific': 'America/Vancouver',
+    'europe/belfast': 'Europe/London', 'europe/kiev': 'Europe/Kyiv',
+    'europe/tiraspol': 'Europe/Chisinau', 'europe/uzhgorod': 'Europe/Kyiv',
+    'europe/zaporozhye': 'Europe/Kyiv', 'mexico/bajanorte': 'America/Tijuana',
+    'mexico/bajasur': 'America/Mazatlan', 'mexico/general': 'America/Mexico_City',
+    'pacific/johnston': 'Pacific/Honolulu', 'pacific/ponape': 'Pacific/Pohnpei',
+    'pacific/samoa': 'Pacific/Pago_Pago', 'pacific/truk': 'Pacific/Chuuk',
+    'pacific/yap': 'Pacific/Chuuk', 'us/alaska': 'America/Anchorage',
+    'us/aleutian': 'America/Adak', 'us/arizona': 'America/Phoenix',
+    'us/central': 'America/Chicago', 'us/east-indiana': 'America/Indiana/Indianapolis',
+    'us/eastern': 'America/New_York', 'us/hawaii': 'Pacific/Honolulu',
+    'us/indiana-starke': 'America/Indiana/Knox', 'us/michigan': 'America/Detroit',
+    'us/mountain': 'America/Denver', 'us/pacific': 'America/Los_Angeles',
+    'us/samoa': 'Pacific/Pago_Pago', 'etc/greenwich': 'Etc/GMT',
+    'etc/uct': 'Etc/UTC', 'etc/universal': 'Etc/UTC', 'etc/zulu': 'Etc/UTC',
+    'gmt0': 'Etc/GMT', 'greenwich': 'Etc/GMT', 'hongkong': 'Asia/Hong_Kong',
+    'iceland': 'Atlantic/Reykjavik', 'iran': 'Asia/Tehran', 'israel': 'Asia/Jerusalem',
+    'jamaica': 'America/Jamaica', 'japan': 'Asia/Tokyo', 'kwajalein': 'Pacific/Kwajalein',
+    'libya': 'Africa/Tripoli', 'nz': 'Pacific/Auckland', 'nz-chat': 'Pacific/Chatham',
+    'poland': 'Europe/Warsaw', 'portugal': 'Europe/Lisbon', 'prc': 'Asia/Shanghai',
+    'roc': 'Asia/Taipei', 'singapore': 'Asia/Singapore', 'turkey': 'Europe/Istanbul',
     'w-su': 'Europe/Moscow'
   };
-  const offsetTimezoneFallbacks = {
-    '+0330': 'Asia/Tehran',
-    '+0430': 'Asia/Kabul',
-    '+0530': 'Asia/Kolkata',
-    '+0545': 'Asia/Kathmandu',
-    '+0630': 'Asia/Yangon',
-    '+0845': 'Australia/Eucla',
-    '+0930': 'Australia/Darwin',
-    '+1030': 'Australia/Lord_Howe',
-    '+1245': 'Pacific/Chatham',
-    '-0330': 'America/St_Johns'
-  };
-  const supportedTimezoneMaps = (() => {
-    if (typeof Intl.supportedValuesOf !== 'function') return null;
 
+  const offsetTimezoneFallbacks = {
+    '+0330': 'Asia/Tehran', '+0430': 'Asia/Kabul', '+0530': 'Asia/Kolkata',
+    '+0545': 'Asia/Kathmandu', '+0630': 'Asia/Yangon', '+0845': 'Australia/Eucla',
+    '+0930': 'Australia/Adelaide', '+1030': 'Australia/Lord_Howe',
+    '+1245': 'Pacific/Chatham', '-0930': 'Pacific/Marquesas'
+  };
+
+  // ── Timezone helpers ───────────────────────────────────────────────────────
+  let supportedTimezoneMaps = null;
+
+  function buildSupportedTimezoneMaps() {
+    if (typeof Intl.supportedValuesOf !== 'function') return null;
     try {
+      const supportedZones = Intl.supportedValuesOf('timeZone');
       const byLower = new Map();
       const byCompact = new Map();
       const byCityCompact = new Map();
-      const supportedZones = Intl.supportedValuesOf('timeZone');
-
-      for (const zone of supportedZones) {
-        const lowerZone = zone.toLowerCase();
-        const compactZone = lowerZone.replace(/[^a-z0-9]/g, '');
-        const zoneParts = lowerZone.split('/');
-        const cityPart = zoneParts[zoneParts.length - 1] || '';
-        const compactCity = cityPart.replace(/[^a-z0-9]/g, '');
-
-        byLower.set(lowerZone, zone);
-
-        if (!byCompact.has(compactZone)) {
-          byCompact.set(compactZone, zone);
-        }
-
-        if (compactCity) {
-          if (!byCityCompact.has(compactCity)) {
-            byCityCompact.set(compactCity, zone);
-          } else if (byCityCompact.get(compactCity) !== zone) {
-            byCityCompact.set(compactCity, null);
-          }
-        }
+      for (const tz of supportedZones) {
+        byLower.set(tz.toLowerCase(), tz);
+        byCompact.set(tz.toLowerCase().replace(/[^a-z0-9]/g, ''), tz);
+        const parts = tz.split('/');
+        const city = parts[parts.length - 1];
+        if (city) byCityCompact.set(city.toLowerCase().replace(/[^a-z0-9]/g, ''), tz);
       }
-
       return { byLower, byCompact, byCityCompact };
-    } catch {
-      return null;
-    }
-  })();
+    } catch { return null; }
+  }
+
+  supportedTimezoneMaps = buildSupportedTimezoneMaps();
 
   function getCompactTimezoneKey(value) {
-    return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return String(value).toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
   function normalizeTimezoneToken(value) {
-    return value
-      .replace(/\s*\/\s*/g, '/')
-      .replace(/\s+/g, '_')
-      .trim();
+    if (!value || typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    return trimmed.replace(/\s+/g, '_');
   }
 
   function parseUtcOffsetTimezone(rawTimezone) {
     if (typeof rawTimezone !== 'string') return null;
-
-    const trimmed = rawTimezone.trim();
-    if (!trimmed) return null;
-
-    const utcMatch = trimmed.match(/^(?:UTC|GMT)?\s*([+-])\s*(\d{1,2})(?::?(\d{2}))?$/i);
-    if (!utcMatch) {
-      if (/^(?:UTC|GMT|Z)$/i.test(trimmed)) {
-        return 'UTC';
-      }
-
-      return null;
-    }
-
-    const sign = utcMatch[1];
-    const hours = Number(utcMatch[2]);
-    const minutes = Number(utcMatch[3] || '0');
-
-    if (Number.isNaN(hours) || Number.isNaN(minutes) || hours > 14 || minutes > 59) {
-      return null;
-    }
-
-    const offsetKey = `${sign}${String(hours).padStart(2, '0')}${String(minutes).padStart(2, '0')}`;
-    if (minutes !== 0) {
-      return offsetTimezoneFallbacks[offsetKey] || null;
-    }
-
-    if (hours === 0) {
-      return 'Etc/GMT';
-    }
-
-    const etcSign = sign === '+' ? '-' : '+';
-    return `Etc/GMT${etcSign}${hours}`;
+    const match = rawTimezone.match(/^(?:UTC|GMT)?([+-])(\d{1,2}):?(\d{2})?$/i);
+    if (!match) return null;
+    const sign = match[1];
+    const hours = match[2].padStart(2, '0');
+    const minutes = (match[3] || '00').padStart(2, '0');
+    const key = `${sign}${hours}${minutes}`;
+    return offsetTimezoneFallbacks[key] || null;
   }
 
   function getTimezoneTokens(timezone) {
     if (typeof timezone !== 'string') return [];
-
-    const strippedTimezone = timezone
-      .replace(/\((?:[^)(]|\([^)(]*\))*\)/g, ' ')
+    const stripped = timezone
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/\b(?:standard|daylight|summer|winter|time)\b/gi, ' ')
       .trim();
-
-    if (!strippedTimezone) return [];
-
-    const parts = strippedTimezone
-      .split(/[|,;]/)
-      .map((part) => part.trim())
-      .filter(Boolean);
-
-    return parts.length > 0 ? parts : [strippedTimezone];
+    return stripped.split(/[,;|/\s]+/).filter(Boolean);
   }
 
-  function setLoaderSkipForNextNavigation() {
-    try {
-      window.sessionStorage.setItem(loaderSkipNavigationKey, '1');
-    } catch {}
-  }
-
-  function consumeLoaderSkipForNavigation() {
-    try {
-      const shouldSkip = window.sessionStorage.getItem(loaderSkipNavigationKey) === '1';
-
-      if (shouldSkip) {
-        window.sessionStorage.removeItem(loaderSkipNavigationKey);
+  function getCanonicalTimezone(timezone) {
+    const tokens = getTimezoneTokens(timezone);
+    for (const token of tokens) {
+      const normalized = normalizeTimezoneToken(token);
+      if (!normalized) continue;
+      const candidates = [normalized];
+      const alias = timezoneAliases[normalized.toLowerCase()];
+      if (alias) candidates.push(alias);
+      const offset = parseUtcOffsetTimezone(token);
+      if (offset) candidates.push(offset);
+      if (supportedTimezoneMaps) {
+        for (const c of candidates) {
+          const direct = supportedTimezoneMaps.byLower.get(c.toLowerCase());
+          if (direct) return direct;
+        }
+        for (const c of candidates) {
+          const compact = supportedTimezoneMaps.byCompact.get(getCompactTimezoneKey(c));
+          if (compact) return compact;
+        }
+        if (!normalized.includes('/')) {
+          const city = supportedTimezoneMaps.byCityCompact.get(getCompactTimezoneKey(normalized));
+          if (city) return city;
+        }
       }
-
-      return shouldSkip;
-    } catch {
-      return false;
+      for (const c of candidates) {
+        try {
+          const resolved = new Intl.DateTimeFormat('en-GB', { timeZone: c }).resolvedOptions().timeZone;
+          return resolved || c;
+        } catch {}
+      }
     }
-  }
-
-  function normalizeCookieConsentValue(value) {
-    return value === 'accept' || value === 'reject' ? value : null;
-  }
-
-  function getCookieValue(name) {
-    const encodedName = encodeURIComponent(name);
-    const prefix = `${encodedName}=`;
-    const cookieParts = document.cookie ? document.cookie.split('; ') : [];
-
-    for (const cookiePart of cookieParts) {
-      if (!cookiePart.startsWith(prefix)) continue;
-      return decodeURIComponent(cookiePart.slice(prefix.length));
-    }
-
     return null;
   }
 
-  function setCookieValue(name, value, maxAgeSeconds) {
-    const encodedName = encodeURIComponent(name);
-    const encodedValue = encodeURIComponent(value);
-    const maxAge = Number.isFinite(maxAgeSeconds)
-      ? Math.max(0, Math.floor(maxAgeSeconds))
-      : 0;
+  userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
 
-    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
-    document.cookie = `${encodedName}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
-  }
-
-  function getLocalCookieConsent() {
+  // ── Time display ───────────────────────────────────────────────────────────
+  function formatClockTime(date, timezone) {
     try {
-      return normalizeCookieConsentValue(window.localStorage.getItem(cookieConsentKey));
+      return new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false, timeZone: timezone
+      }).format(date);
     } catch {
-      return null;
+      return new Intl.DateTimeFormat('en-GB', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).format(date);
     }
   }
 
-  function setLocalCookieConsent(value) {
+  function getTimezoneOffsetMinutes(date, timezone) {
     try {
-      window.localStorage.setItem(cookieConsentKey, value);
-    } catch {}
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: timezone, hour12: false, hourCycle: 'h23',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      }).formatToParts(date);
+      const v = {};
+      for (const p of parts) if (p.type !== 'literal') v[p.type] = p.value;
+      const zonedTimestamp = Date.UTC(
+        Number(v.year), Number(v.month) - 1, Number(v.day),
+        Number(v.hour), Number(v.minute), Number(v.second)
+      );
+      return Math.round((zonedTimestamp - date.getTime()) / 60000);
+    } catch { return 0; }
   }
 
-  function clearLocalCookieConsent() {
-    try {
-      window.localStorage.removeItem(cookieConsentKey);
-    } catch {}
+  function formatTimeDifference(date, ref, comp) {
+    const diff = getTimezoneOffsetMinutes(date, comp) - getTimezoneOffsetMinutes(date, ref);
+    if (!Number.isFinite(diff) || diff === 0) return 'Same as Liverpool';
+    const abs = Math.abs(diff);
+    const h = Math.floor(abs / 60);
+    const m = abs % 60;
+    const parts = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0) parts.push(`${m}m`);
+    const sign = diff > 0 ? '+' : '-';
+    const dir = diff > 0 ? 'ahead of Liverpool' : 'behind Liverpool';
+    return `${sign}${parts.join(' ')} ${dir}`;
   }
 
-  function getCookieConsent() {
-    const consentFromCookie = normalizeCookieConsentValue(getCookieValue(cookieConsentKey));
-    const consentFromStorage = getLocalCookieConsent();
+  function getFallbackLocationLabel(timezone) {
+    const canonical = getCanonicalTimezone(timezone);
+    if (!canonical) return 'Local device';
+    const parts = canonical.split('/');
+    return (parts[parts.length - 1] || canonical).replace(/_/g, ' ');
+  }
 
-    if (!consentFromCookie && consentFromStorage) {
-      clearLocalCookieConsent();
-      return null;
+  function updateTimeMetadata() {
+    const now = new Date();
+    const locationBits = [userLocation?.city, userLocation?.countryCode || userLocation?.country].filter(Boolean);
+    const locationLabel = locationBits.length > 0
+      ? locationBits.join(', ')
+      : getFallbackLocationLabel(userTimezone);
+    const differenceLabel = formatTimeDifference(now, ukTimezone, userTimezone);
+
+    if (myTimezoneElement) myTimezoneElement.textContent = `${ukTimezone} · local time`;
+    if (yourTimeLabelElement) yourTimeLabelElement.textContent = locationLabel ? `Your time (${locationLabel})` : 'Your time';
+    if (yourTimezoneElement) yourTimezoneElement.textContent = [userTimezone, differenceLabel].filter(Boolean).join(' · ');
+  }
+
+  function renderTimeSection() {
+    if (!myTimeElement && !yourTimeElement) return;
+    const now = new Date();
+    if (myTimeElement) myTimeElement.textContent = formatClockTime(now, ukTimezone);
+    if (yourTimeElement) yourTimeElement.textContent = formatClockTime(now, userTimezone);
+    updateTimeMetadata();
+  }
+
+  async function detectUserTimeFromLocation() {
+    const endpoints = [
+      'https://ipwho.is/?fields=success,city,country,country_code,timezone',
+      'https://ipinfo.io/json'
+    ];
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, { cache: 'no-store' });
+        if (!res.ok) continue;
+        const payload = await res.json();
+        if (!payload || payload.success === false) continue;
+        const rawTz = payload.timezone || payload.timeZone || null;
+        const tz = rawTz ? getCanonicalTimezone(typeof rawTz === 'string' ? rawTz : rawTz.name || '') : null;
+        const city = payload.city || null;
+        const countryCode = payload.country_code || (typeof payload.country === 'string' && payload.country.length === 2 ? payload.country : null);
+        const country = payload.country_name || payload.country || null;
+        if (tz) userTimezone = tz;
+        if (city || countryCode) userLocation = { city, countryCode, country };
+        if (tz || city || countryCode) { renderTimeSection(); break; }
+      } catch {}
     }
-
-    if (consentFromCookie && consentFromStorage !== consentFromCookie) {
-      setLocalCookieConsent(consentFromCookie);
-    }
-
-    return consentFromCookie;
+    renderTimeSection();
   }
 
-  function setCookieConsent(value) {
-    const consent = normalizeCookieConsentValue(value);
-    const oneYearInSeconds = 60 * 60 * 24 * 365;
-
-    if (!consent) {
-      setCookieValue(cookieConsentKey, '', 0);
-      clearLocalCookieConsent();
-      return;
-    }
-
-    setCookieValue(cookieConsentKey, consent, oneYearInSeconds);
-    setLocalCookieConsent(consent);
+  if (myTimeElement || yourTimeElement) {
+    renderTimeSection();
+    window.setInterval(renderTimeSection, timeTickIntervalMs);
+    Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
   }
 
-  function markInternalPageNavigations() {
-    const anchors = document.querySelectorAll('a[href]');
-    if (!anchors.length) return;
-
-    const currentUrl = new URL(window.location.href);
-
-    anchors.forEach((anchor) => {
-      anchor.addEventListener('click', (event) => {
-        if (event.defaultPrevented) return;
-        if (event.button !== 0) return;
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        if (anchor.target && anchor.target.toLowerCase() !== '_self') return;
-        if (anchor.hasAttribute('download')) return;
-
-        const rawHref = anchor.getAttribute('href');
-        if (!rawHref || rawHref.startsWith('#')) return;
-
-        let destination;
-
-        try {
-          destination = new URL(anchor.href, window.location.href);
-        } catch {
-          return;
-        }
-
-        if (!/^https?:$/.test(destination.protocol)) return;
-        if (destination.origin !== currentUrl.origin) return;
-
-        const isSameDocument = destination.pathname === currentUrl.pathname
-          && destination.search === currentUrl.search;
-
-        if (isSameDocument) return;
-
-        setLoaderSkipForNextNavigation();
-      });
-    });
-  }
-
-  function disablePageLoaderImmediately() {
-    if (pageLoaderElement && pageLoaderElement.parentElement) {
-      pageLoaderElement.parentElement.removeChild(pageLoaderElement);
-    }
-
-    document.body.classList.remove('is-site-loading');
-  }
-
-  function showLoaderDoneState() {
-    if (!pageLoaderElement || hasShownLoaderDone || hasHiddenLoader) return;
-
-    hasShownLoaderDone = true;
-    pageLoaderElement.classList.add('is-complete');
-
-    window.setTimeout(hidePageLoader, loaderDoneHoldDurationMs);
-  }
-
-  function completePageLoader() {
-    if (!pageLoaderElement || hasStartedLoaderCompletion || hasHiddenLoader) return;
-
-    hasStartedLoaderCompletion = true;
-    pageLoaderElement.classList.add('is-full');
-
-    window.setTimeout(showLoaderDoneState, loaderFullHoldDurationMs);
-  }
-
-  function hidePageLoader() {
-    if (!pageLoaderElement || hasHiddenLoader) return;
-
-    hasHiddenLoader = true;
-    pageLoaderElement.classList.add('is-hidden');
-
-    window.setTimeout(() => {
-      document.body.classList.remove('is-site-loading');
-
-      if (pageLoaderElement.parentElement) {
-        pageLoaderElement.parentElement.removeChild(pageLoaderElement);
-      }
-
-      const cookieConsent = getCookieConsent();
-      if (!cookieConsent && (myTimeElement || yourTimeElement)) {
-        showCookieBanner();
-      }
-    }, loaderFadeDurationMs);
-  }
-
-  function createCookieBanner() {
-    const banner = document.createElement('div');
-    banner.className = 'cookie-banner';
-    banner.id = 'cookie-banner';
-    banner.innerHTML = `
-      <p class="cookie-banner-message">I use some non-essential cookies to power a few extra features and make the site look and feel better. Your call!</p>
-      <div class="cookie-banner-buttons">
-        <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept</button>
-        <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject</button>
-        <a href="/cookies" class="cookie-btn" style="text-decoration: none; line-height: 1;">Cookie Policy</a>
-      </div>
-    `;
-    return banner;
-  }
-
-  function showCookieBanner() {
-    const existingBanner = document.getElementById('cookie-banner');
-    if (existingBanner) return;
-
-    const banner = createCookieBanner();
-    document.body.appendChild(banner);
-
-    const acceptBtn = banner.querySelector('#cookie-accept-btn');
-    const rejectBtn = banner.querySelector('#cookie-reject-btn');
-
-    acceptBtn.addEventListener('click', () => {
-      setCookieConsent('accept');
-      banner.classList.add('hidden');
-      detectUserTimeFromLocation();
-    });
-
-    rejectBtn.addEventListener('click', () => {
-      setCookieConsent('reject');
-      banner.classList.add('hidden');
-    });
-  }
-
-  function startPageLoaderFinish() {
-    if (!pageLoaderElement || hasHiddenLoader || hasStartedLoaderFinish) return;
-
-    hasStartedLoaderFinish = true;
-    pageLoaderElement.classList.add('is-finishing');
-
-    if (loaderElement) {
-      loaderElement.addEventListener('animationiteration', completePageLoader, { once: true });
-    }
-
-    window.setTimeout(() => {
-      if (!hasStartedLoaderCompletion && !hasHiddenLoader) {
-        completePageLoader();
-      }
-    }, loaderFinishTimeoutMs);
-  }
-
-  function queuePageLoaderFinish() {
-    if (!pageLoaderElement || hasHiddenLoader || hasStartedLoaderFinish) return;
-
-    const elapsed = Date.now() - loaderStartTimestamp;
-    const remaining = Math.max(0, minLoaderDurationMs - elapsed);
-    window.setTimeout(startPageLoaderFinish, remaining);
-  }
-
-  markInternalPageNavigations();
-  const shouldSkipLoaderForInternalNavigation = consumeLoaderSkipForNavigation();
-  const shouldRunPageLoader = Boolean(pageLoaderElement) && !shouldSkipLoaderForInternalNavigation;
-
-  if (shouldRunPageLoader) {
-    window.setTimeout(startPageLoaderFinish, maxLoaderDurationMs);
-
-    if (document.readyState === 'complete') {
-      queuePageLoaderFinish();
-    } else {
-      window.addEventListener('load', queuePageLoaderFinish, { once: true });
-    }
-  } else {
-    disablePageLoaderImmediately();
-  }
-
+  // ── Activity calendar ──────────────────────────────────────────────────────
   function escapeHtml(str) {
     const d = document.createElement('div');
     d.textContent = String(str);
@@ -522,25 +340,17 @@
   }
 
   function escapeAttribute(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function toUtcDate(year, month, day) {
-    return new Date(Date.UTC(year, month, day));
-  }
+  function toUtcDate(year, month, day) { return new Date(Date.UTC(year, month, day)); }
 
   function parseIsoDate(dateStr) {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    return toUtcDate(year, month - 1, day);
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return toUtcDate(y, m - 1, d);
   }
 
-  function toIsoDate(date) {
-    return date.toISOString().slice(0, 10);
-  }
+  function toIsoDate(date) { return date.toISOString().slice(0, 10); }
 
   function addUtcDays(date, amount) {
     const next = new Date(date);
@@ -548,85 +358,49 @@
     return next;
   }
 
-  function getMondayBasedDayIndex(date) {
-    return (date.getUTCDay() + 6) % 7;
-  }
+  function getMondayBasedDayIndex(date) { return (date.getUTCDay() + 6) % 7; }
 
   function clampLevel(level) {
-    const numericLevel = Number(level);
-    if (!Number.isFinite(numericLevel)) return 0;
-    return Math.max(0, Math.min(4, numericLevel));
+    const n = Number(level);
+    return Number.isFinite(n) ? Math.max(0, Math.min(4, n)) : 0;
   }
 
   function recomputeLevels(days) {
     const max = Math.max(0, ...days.map(d => d.count));
     if (max === 0) return days;
-
-    return days.map(d => {
-      if (d.count === 0) return { ...d, level: 0 };
-      return { ...d, level: Math.ceil((d.count / max) * 4) };
-    });
+    return days.map(d => d.count === 0 ? { ...d, level: 0 } : { ...d, level: Math.ceil((d.count / max) * 4) });
   }
 
   function getActivityRange(today = new Date()) {
-    const end = toUtcDate(
-      today.getUTCFullYear(),
-      today.getUTCMonth(),
-      today.getUTCDate()
-    );
+    const end = toUtcDate(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
     const start = toUtcDate(today.getUTCFullYear(), 0, 1);
     return { start, end };
   }
 
   async function fetchActivityDays(username, start, end, hourBucket) {
-    const years = Array.from(new Set([
-      start.getUTCFullYear(),
-      end.getUTCFullYear()
-    ]));
-
+    const years = Array.from(new Set([start.getUTCFullYear(), end.getUTCFullYear()]));
     const payloads = await Promise.all(years.map(async (year) => {
-      const params = new URLSearchParams({
-        y: String(year),
-        cb: String(hourBucket)
-      });
-      const response = await fetch(`${activityApiBase}${encodeURIComponent(username)}?${params.toString()}`, {
-        cache: 'no-store'
-      });
-      if (!response.ok) {
-        throw new Error('activity fetch failed');
-      }
-
+      const params = new URLSearchParams({ y: String(year), cb: String(hourBucket) });
+      const response = await fetch(`${activityApiBase}${encodeURIComponent(username)}?${params.toString()}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error('activity fetch failed');
       return response.json();
     }));
 
     const dayMap = new Map();
-
-    payloads.forEach((payload) => {
+    payloads.forEach(payload => {
       if (!Array.isArray(payload.contributions)) return;
-
-      payload.contributions.forEach((entry) => {
+      payload.contributions.forEach(entry => {
         if (!entry || !entry.date) return;
-
-        dayMap.set(entry.date, {
-          count: Number(entry.count) || 0,
-          level: clampLevel(entry.level)
-        });
+        dayMap.set(entry.date, { count: Number(entry.count) || 0, level: clampLevel(entry.level) });
       });
     });
 
     const days = [];
-
     for (let cursor = new Date(start); cursor <= end; cursor = addUtcDays(cursor, 1)) {
       const key = toIsoDate(cursor);
       const entry = dayMap.get(key) || { count: 0, level: 0 };
-
-      days.push({
-        date: key,
-        count: entry.count,
-        level: entry.level
-      });
+      days.push({ date: key, count: entry.count, level: entry.level });
     }
-
     return recomputeLevels(days);
   }
 
@@ -634,17 +408,15 @@
     const renderStart = addUtcDays(start, -getMondayBasedDayIndex(start));
     const renderEnd = addUtcDays(end, 6 - getMondayBasedDayIndex(end));
     const endTime = end.getTime();
-    const dayMap = new Map(days.map((entry) => [entry.date, entry]));
+    const dayMap = new Map(days.map(entry => [entry.date, entry]));
     const weeks = [];
 
     for (let cursor = new Date(renderStart); cursor <= renderEnd;) {
       const week = [];
-
-      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+      for (let i = 0; i < 7; i++) {
         const key = toIsoDate(cursor);
         const isFuture = cursor.getTime() > endTime;
         const entry = dayMap.get(key);
-
         if (isFuture) {
           week.push({ date: key, count: 0, level: 0, isPadding: false, isFuture: true });
         } else if (entry) {
@@ -652,73 +424,46 @@
         } else {
           week.push({ date: key, count: 0, level: 0, isPadding: true, isFuture: false });
         }
-
         cursor = addUtcDays(cursor, 1);
       }
-
       weeks.push(week);
     }
-
     return { weeks, renderStart };
   }
 
   function buildMonthLabels(start, end, renderStart) {
     const labels = [];
-
     for (
       let cursor = new Date(start);
       cursor <= end;
       cursor = toUtcDate(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1)
     ) {
       const offset = Math.round((cursor - renderStart) / msPerDay);
-
-      labels.push({
-        label: monthFormatter.format(cursor),
-        weekIndex: Math.floor(offset / 7) + 1
-      });
+      labels.push({ label: monthFormatter.format(cursor), weekIndex: Math.floor(offset / 7) + 1 });
     }
-
     return labels;
   }
 
   function renderActivityCalendar(container, days, start, end) {
     const { weeks, renderStart } = buildActivityMatrix(days, start, end);
     const monthLabels = buildMonthLabels(start, end, renderStart);
-    const totalContributions = days.reduce((sum, day) => sum + day.count, 0);
+    const totalContributions = days.reduce((sum, d) => sum + d.count, 0);
     const visibleRange = `${monthFormatter.format(start)} ${start.getUTCFullYear()} to ${monthFormatter.format(end)} ${end.getUTCFullYear()}`;
+
     const weekdayLabels = [
-      { label: 'Mon', row: 1 },
-      { label: 'Tue', row: 2 },
-      { label: 'Wed', row: 3 },
-      { label: 'Thu', row: 4 },
-      { label: 'Fri', row: 5 },
-      { label: 'Sat', row: 6 },
-      { label: 'Sun', row: 7 }
+      { label: 'Mon', row: 1 }, { label: 'Tue', row: 2 }, { label: 'Wed', row: 3 },
+      { label: 'Thu', row: 4 }, { label: 'Fri', row: 5 }, { label: 'Sat', row: 6 }, { label: 'Sun', row: 7 }
     ];
 
-    const monthMarkup = monthLabels.map((item) => `
-      <span class="activity-month" style="grid-column:${item.weekIndex};">${item.label}</span>
-    `).join('');
+    const monthMarkup = monthLabels.map(item =>
+      `<span class="activity-month" style="grid-column:${item.weekIndex};">${item.label}</span>`
+    ).join('');
 
-    const gridMarkup = weeks.map((week) => week.map((day) => {
-      if (day.isFuture) {
-        return '<span class="activity-cell activity-cell-future" aria-hidden="true"></span>';
-      }
-
-      if (day.isPadding) {
-        return '<span class="activity-cell activity-level-0 activity-cell-padding" aria-hidden="true"></span>';
-      }
-
-      const description = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${accessibleDateFormatter.format(parseIsoDate(day.date))}`;
-
-      return `
-        <span
-          class="activity-cell activity-level-${day.level}"
-          role="gridcell"
-          aria-label="${escapeAttribute(description)}"
-          title="${escapeAttribute(description)}"
-        ></span>
-      `;
+    const gridMarkup = weeks.map(week => week.map(day => {
+      if (day.isFuture) return '<span class="activity-cell activity-cell-future" aria-hidden="true"></span>';
+      if (day.isPadding) return '<span class="activity-cell activity-level-0 activity-cell-padding" aria-hidden="true"></span>';
+      const desc = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${accessibleDateFormatter.format(parseIsoDate(day.date))}`;
+      return `<span class="activity-cell activity-level-${day.level}" role="gridcell" aria-label="${escapeAttribute(desc)}" title="${escapeAttribute(desc)}"></span>`;
     }).join('')).join('');
 
     container.innerHTML = `
@@ -729,7 +474,7 @@
         </div>
         <div class="activity-grid-row">
           <div class="activity-weekdays" aria-hidden="true">
-            ${weekdayLabels.map((item) => `<span style="grid-row:${item.row};">${item.label}</span>`).join('')}
+            ${weekdayLabels.map(item => `<span style="grid-row:${item.row};">${item.label}</span>`).join('')}
           </div>
           <div class="activity-grid" role="grid" aria-label="GitHub activity from ${escapeAttribute(visibleRange)}">
             ${gridMarkup}
@@ -754,6 +499,39 @@
     `;
   }
 
+  async function refreshActivityCalendar() {
+    if (!calendar || isRefreshingActivity) return;
+    isRefreshingActivity = true;
+    try {
+      const { start, end } = getActivityRange();
+      const hourBucket = Math.floor(Date.now() / activityRefreshIntervalMs);
+      const activityDays = await fetchActivityDays(activityUsername, start, end, hourBucket);
+      renderActivityCalendar(calendar, activityDays, start, end);
+    } catch {
+      if (calendar) calendar.textContent = 'Activity unavailable right now.';
+    } finally {
+      isRefreshingActivity = false;
+    }
+  }
+
+  function scheduleActivityRefreshOnTheHour() {
+    const now = new Date();
+    const nextHour = new Date(now);
+    nextHour.setMinutes(0, 0, 0);
+    nextHour.setHours(nextHour.getHours() + 1);
+    const delay = Math.max(1000, nextHour.getTime() - now.getTime());
+    window.setTimeout(async () => {
+      await refreshActivityCalendar();
+      scheduleActivityRefreshOnTheHour();
+    }, delay);
+  }
+
+  if (calendar) {
+    Promise.resolve().then(() => refreshActivityCalendar()).catch(() => {});
+    scheduleActivityRefreshOnTheHour();
+  }
+
+  // ── Blog posts ─────────────────────────────────────────────────────────────
   function safeUrl(url) {
     try {
       const u = new URL(url);
@@ -767,311 +545,22 @@
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  function formatClockTime(date, timezone) {
-    try {
-      return new Intl.DateTimeFormat('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-        timeZone: timezone
-      }).format(date);
-    } catch {
-      return new Intl.DateTimeFormat('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      }).format(date);
-    }
-  }
-
-  function getTimezoneOffsetMinutes(date, timezone) {
-    try {
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: timezone,
-        hour12: false,
-        hourCycle: 'h23',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      }).formatToParts(date);
-      const values = Object.create(null);
-
-      for (const part of parts) {
-        if (part.type !== 'literal') {
-          values[part.type] = part.value;
-        }
-      }
-
-      const zonedTimestamp = Date.UTC(
-        Number(values.year),
-        Number(values.month) - 1,
-        Number(values.day),
-        Number(values.hour),
-        Number(values.minute),
-        Number(values.second)
-      );
-
-      return Math.round((zonedTimestamp - date.getTime()) / 60000);
-    } catch {
-      return 0;
-    }
-  }
-
-  function formatTimeDifference(date, referenceTimezone, comparisonTimezone) {
-    const differenceInMinutes = getTimezoneOffsetMinutes(date, comparisonTimezone)
-      - getTimezoneOffsetMinutes(date, referenceTimezone);
-
-    if (!Number.isFinite(differenceInMinutes) || differenceInMinutes === 0) {
-      return 'Same as Liverpool';
-    }
-
-    const absoluteMinutes = Math.abs(differenceInMinutes);
-    const hours = Math.floor(absoluteMinutes / 60);
-    const minutes = absoluteMinutes % 60;
-    const durationParts = [];
-
-    if (hours > 0) {
-      durationParts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
-    }
-
-    if (minutes > 0) {
-      durationParts.push(`${minutes} min${minutes === 1 ? '' : 's'}`);
-    }
-
-    const sign = differenceInMinutes > 0 ? '+' : '-';
-    const direction = differenceInMinutes > 0 ? 'ahead of Liverpool' : 'behind Liverpool';
-    return `${sign}${durationParts.join(' ')} ${direction}`;
-  }
-
-  function getFallbackLocationLabel(timezone) {
-    const canonicalTimezone = getCanonicalTimezone(timezone);
-    if (!canonicalTimezone) {
-      return 'Local device';
-    }
-
-    const timezoneParts = canonicalTimezone.split('/');
-    const cityName = timezoneParts[timezoneParts.length - 1]?.replace(/_/g, ' ');
-    return cityName || canonicalTimezone;
-  }
-
-  function updateTimeMetadata() {
-    const now = new Date();
-    const locationBits = [userLocation?.city, userLocation?.countryCode || userLocation?.country].filter(Boolean);
-    const locationLabel = locationBits.length > 0
-      ? locationBits.join(', ')
-      : getFallbackLocationLabel(userTimezone);
-    const differenceLabel = formatTimeDifference(now, ukTimezone, userTimezone);
-
-    if (myTimezoneElement) {
-      myTimezoneElement.textContent = `${ukTimezone} · local time`;
-    }
-
-    if (yourTimeLabelElement) {
-      yourTimeLabelElement.textContent = locationLabel
-        ? `Your time (${locationLabel})`
-        : 'Your time';
-    }
-
-    if (yourTimezoneElement) {
-      const metadataBits = [userTimezone, differenceLabel].filter(Boolean);
-      yourTimezoneElement.textContent = metadataBits.join(' · ');
-    }
-  }
-
-  function getCanonicalTimezone(timezone) {
-    const timezoneTokens = getTimezoneTokens(timezone);
-
-    for (const token of timezoneTokens) {
-      const normalizedToken = normalizeTimezoneToken(token);
-      if (!normalizedToken) continue;
-
-      const timezoneCandidates = [];
-      const addCandidate = (candidate) => {
-        if (!candidate) return;
-        if (!timezoneCandidates.includes(candidate)) {
-          timezoneCandidates.push(candidate);
-        }
-      };
-
-      addCandidate(normalizedToken);
-
-      const aliasTimezone = timezoneAliases[normalizedToken.toLowerCase()];
-      addCandidate(aliasTimezone);
-
-      const offsetTimezone = parseUtcOffsetTimezone(token);
-      addCandidate(offsetTimezone);
-
-      if (supportedTimezoneMaps) {
-        for (const candidate of timezoneCandidates) {
-          const directMatch = supportedTimezoneMaps.byLower.get(candidate.toLowerCase());
-          if (directMatch) return directMatch;
-        }
-
-        for (const candidate of timezoneCandidates) {
-          const compactMatch = supportedTimezoneMaps.byCompact.get(getCompactTimezoneKey(candidate));
-          if (compactMatch) return compactMatch;
-        }
-
-        if (!normalizedToken.includes('/')) {
-          const cityMatch = supportedTimezoneMaps.byCityCompact.get(getCompactTimezoneKey(normalizedToken));
-          if (cityMatch) return cityMatch;
-        }
-      }
-
-      for (const candidate of timezoneCandidates) {
-        try {
-          const resolvedTimezone = new Intl.DateTimeFormat('en-GB', { timeZone: candidate })
-            .resolvedOptions()
-            .timeZone;
-          return resolvedTimezone || candidate;
-        } catch {}
-      }
-    }
-
-    return null;
-  }
-
-  function isValidTimezone(timezone) {
-    return Boolean(getCanonicalTimezone(timezone));
-  }
-
-  userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
-
-  function normalizeLocationPayload(payload) {
-    if (!payload || payload.success === false) return null;
-
-    const payloadTimezone = payload.timezone || payload.timeZone || payload.time_zone || payload.tz;
-    const rawTimezone = payloadTimezone
-      ? (typeof payloadTimezone === 'string'
-        ? payloadTimezone
-        : payloadTimezone.id || payloadTimezone.name || payloadTimezone.timezone || payloadTimezone.value)
-      : null;
-    const timezone = getCanonicalTimezone(rawTimezone);
-
-    const city = payload.city || null;
-    const countryCode = payload.country_code
-      || (typeof payload.country === 'string' && payload.country.length === 2 ? payload.country : null)
-      || null;
-    const country = payload.country_name || payload.country || null;
-
-    return { timezone, city, countryCode, country };
-  }
-
-  function renderTimeSection() {
-    if (!myTimeElement && !yourTimeElement) return;
-
-    const now = new Date();
-
-    if (myTimeElement) {
-      myTimeElement.textContent = formatClockTime(now, ukTimezone);
-    }
-
-    if (yourTimeElement) {
-      yourTimeElement.textContent = formatClockTime(now, userTimezone);
-    }
-
-    updateTimeMetadata();
-  }
-
-  async function detectUserTimeFromLocation() {
-    renderTimeSection();
-
-    const locationEndpoints = [
-      'https://ipwho.is/?fields=success,city,country,country_code,timezone',
-      'https://ipinfo.io/json'
-    ];
-
-    for (const endpoint of locationEndpoints) {
-      try {
-        const response = await fetch(endpoint, { cache: 'no-store' });
-        if (!response.ok) continue;
-
-        const payload = await response.json();
-        const data = normalizeLocationPayload(payload);
-        if (!data) continue;
-
-        const hasValidTimezone = Boolean(data.timezone);
-
-        if (hasValidTimezone) {
-          userTimezone = data.timezone;
-        }
-
-        const locationBits = [data.city, data.countryCode || data.country].filter(Boolean);
-        if (locationBits.length > 0) {
-          userLocation = {
-            city: data.city || null,
-            countryCode: data.countryCode || null,
-            country: data.country || null
-          };
-        }
-
-        if (hasValidTimezone || locationBits.length > 0) {
-          renderTimeSection();
-          break;
-        }
-      } catch {}
-    }
-
-    renderTimeSection();
-  }
-
-  if (myTimeElement || yourTimeElement) {
-    renderTimeSection();
-    window.setInterval(renderTimeSection, timeTickIntervalMs);
-    const cookieConsent = getCookieConsent();
-    if (cookieConsent === 'accept') {
-      Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
-    }
-  }
-
-  async function refreshActivityCalendar() {
-    if (!calendar || isRefreshingActivity) return;
-
-    isRefreshingActivity = true;
-
-    try {
-      const { start, end } = getActivityRange();
-      const hourBucket = Math.floor(Date.now() / activityRefreshIntervalMs);
-      const activityDays = await fetchActivityDays(activityUsername, start, end, hourBucket);
-      renderActivityCalendar(calendar, activityDays, start, end);
-    } catch {
-      calendar.textContent = 'Activity unavailable right now.';
-    } finally {
-      isRefreshingActivity = false;
-    }
-  }
-
-  function scheduleActivityRefreshOnTheHour() {
-    const now = new Date();
-    const nextHour = new Date(now);
-    nextHour.setMinutes(0, 0, 0);
-    nextHour.setHours(nextHour.getHours() + 1);
-
-    const delay = Math.max(1000, nextHour.getTime() - now.getTime());
-
-    window.setTimeout(async () => {
-      await refreshActivityCalendar();
-      scheduleActivityRefreshOnTheHour();
-    }, delay);
-  }
-
-  if (calendar) {
-    Promise.resolve().then(() => refreshActivityCalendar()).catch(() => {});
-    scheduleActivityRefreshOnTheHour();
+  function getItemTitle(item) {
+    const el = item.getElementsByTagName('title')[0];
+    if (!el) return '';
+    // textContent handles CDATA sections in most browsers; fall back to innerHTML stripped
+    const t = el.textContent || el.innerHTML || '';
+    return t.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
   }
 
   async function fetchFeedItems() {
     const rssUrl = 'https://gekkzzz.substack.com/feed';
     const proxies = [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
+      `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl)}`,
+      `https://thingproxy.freeboard.io/fetch/${rssUrl}`
     ];
-
     for (const proxyUrl of proxies) {
       try {
         const controller = new AbortController();
@@ -1080,11 +569,13 @@
         window.clearTimeout(tid);
         if (!res.ok) continue;
         const text = await res.text();
+        if (!text || text.length < 50) continue;
         const xml = new DOMParser().parseFromString(text, 'text/xml');
         if (xml.querySelector('parsererror')) continue;
         const items = Array.from(xml.getElementsByTagName('item')).slice(0, 3);
         if (items.length === 0) continue;
-        return items;
+        // Only return if at least one item has a title
+        if (items.some(i => getItemTitle(i))) return items;
       } catch {}
     }
     return null;
@@ -1099,7 +590,7 @@
           return;
         }
         list.innerHTML = items.map(item => {
-          const title = item.getElementsByTagName('title')[0]?.textContent?.trim() || '';
+          const title = getItemTitle(item);
           const link = item.getElementsByTagName('link')[0]?.textContent?.trim()
             || item.getElementsByTagName('guid')[0]?.textContent?.trim() || '';
           const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '';
@@ -1113,7 +604,47 @@
       }
     })();
   }
+})();
 
-  window.siteGetCookieConsent = getCookieConsent;
-  window.siteSetCookieConsent = setCookieConsent;
+// Live GitHub language percentages
+(function () {
+  const LANG_COLORS = {
+    JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572A5',
+    CSS: '#563d7c', HTML: '#e34c26', SCSS: '#c6538c', Shell: '#89e051',
+    Vue: '#41b883', Svelte: '#ff3e00', Ruby: '#701516', Go: '#00ADD8',
+    Rust: '#dea584', PHP: '#4F5D95', Kotlin: '#A97BFF', Swift: '#F05138',
+    Dockerfile: '#384d54', MDX: '#fcb32c', Markdown: '#083fa1'
+  };
+
+  function langColor(name) {
+    return LANG_COLORS[name] || '#888888';
+  }
+
+  function renderLangBar(card, langs) {
+    const total = Object.values(langs).reduce((a, b) => a + b, 0);
+    if (total === 0) return;
+    const entries = Object.entries(langs)
+      .map(([name, bytes]) => ({ name, pct: (bytes / total * 100) }))
+      .sort((a, b) => b.pct - a.pct);
+
+    const bar = card.querySelector('.lang-bar');
+    const list = card.querySelector('.lang-list');
+    if (!bar || !list) return;
+
+    bar.innerHTML = entries.map(e =>
+      `<div class="lang-bar-seg" style="width:${e.pct.toFixed(1)}%;background:${langColor(e.name)};"></div>`
+    ).join('');
+
+    list.innerHTML = entries.map(e =>
+      `<li class="lang-item"><span class="lang-dot" style="background:${langColor(e.name)};"></span><span class="lang-name">${e.name}</span><span class="lang-pct">${e.pct.toFixed(1)}%</span></li>`
+    ).join('');
+  }
+
+  document.querySelectorAll('.project-card[data-github-repo]').forEach(function (card) {
+    const repo = card.dataset.githubRepo;
+    fetch(`https://api.github.com/repos/${repo}/languages`, { cache: 'force-cache' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) { if (data) renderLangBar(card, data); })
+      .catch(function () {});
+  });
 })();

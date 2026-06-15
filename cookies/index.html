@@ -3,155 +3,160 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cookie Policy - gekkzzz</title>
-  <meta name="description" content="Cookie policy for gekkzzz.github.io — what cookies are used and how to manage your preferences.">
-  <link rel="icon" type="image/png" href="../assets/images/avatar.png">
+  <title>Cookie Policy &mdash; gekkzzz</title>
+  <meta name="description" content="Cookie and privacy policy for gekkzzz.co.uk — what data is used, why, and how to manage your preferences.">
+  <link rel="canonical" href="https://gekkzzz.co.uk/cookies/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gekkzzz.co.uk/cookies/">
+  <meta property="og:title" content="Cookie Policy — gekkzzz">
+  <meta property="og:description" content="Cookie and privacy policy for gekkzzz.co.uk — what data is used and how to manage your preferences.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Cookie Policy — gekkzzz">
+  <meta name="twitter:description" content="Cookie and privacy policy for gekkzzz.co.uk — what data is used and how to manage your preferences.">
   <link rel="stylesheet" href="../assets/css/site.css">
+  <script>
+    (function () {
+      var pref = localStorage.getItem('gekkzzz-theme') || 'dark';
+      if (pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
-<body class="is-site-loading">
+<body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  <div class="page-loader" id="page-loader" aria-hidden="true">
-    <div class="loader-shell">
-      <p class="activity-update-note loader-note">Loading</p>
-      <div class="loader-slot">
-        <div class="loader" aria-hidden="true"></div>
-        <h2 class="section-title loader-done">DONE!</h2>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/">home</a>
+      <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">blog</a>
+      <a href="/contact">contact</a>
+      <div class="theme-toggle" role="group" aria-label="Theme preference">
+        <button class="theme-btn" data-theme="dark" type="button" title="Dark mode">dark</button>
+        <button class="theme-btn" data-theme="light" type="button" title="Light mode">light</button>
+        <button class="theme-btn" data-theme="system" type="button" title="Follow system setting">auto</button>
+        <button class="theme-btn" id="anim-toggle-btn" type="button" title="Toggle background animation">anim: on</button>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <div class="page-wrap">
-    <a class="corner-avatar-link" href="/" aria-label="Back to home">
-      <img class="corner-avatar" src="../assets/images/avatar.png" alt="Avatar">
-    </a>
-
-    <div class="container">
+    <main id="main-content">
       <header class="hero">
-        <div>
-          <h1 class="site-title">Cookie Policy</h1>
-          <p class="eyebrow">Transparency &amp; Your Control</p>
-        </div>
-
-        <nav class="hero-links" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
-          <a href="/about">About</a>
-          <a href="/work">My Work</a>
-          <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
-        </nav>
+        <h1 class="hero-name">Cookie Policy</h1>
+        <p class="hero-bio">Last updated: June 2026</p>
       </header>
 
-      <main id="main-content">
-        <section class="posts cookie-policy">
-          <div class="section-head">
-            <h2 class="section-title">What cookies do I use?</h2>
-          </div>
-
-          <p>This site is intentionally minimal and avoids unnecessary tracking. I use a single type of optional data storage:</p>
-
-          <h3>Location/Timezone Lookup (Non-Essential)</h3>
-          <p>
-            <strong>What:</strong> When you visit the home page, an optional feature shows "Your time" based on your timezone. To provide this, the site can fetch your timezone and approximate location (city, country) from IP-based APIs (<code>ipwho.is</code> and <code>ipinfo.io</code>).
-          </p>
-          <p>
-            <strong>Why:</strong> This enriches the "Your time" display so it shows something like "Your time (New York, US)" instead of just a timezone code. It's purely a UX enhancement.
-          </p>
-          <p>
-            <strong>Your IP is:</strong>
-          </p>
-          <ul class="about-list">
-            <li>Sent solely to determine timezone and city/country.</li>
-            <li>Not stored by this site.</li>
-            <li>Subject to the privacy policies of <code>ipwho.is</code> and <code>ipinfo.io</code> respectively.</li>
-          </ul>
-
-          <p><strong>If you reject:</strong> The "Your time" display will still work, but it will show your computer's local timezone without any location enrichment.</p>
-
-          <h3>Session Storage (Essential)</h3>
-          <p>
-            <strong>What:</strong> The site uses browser session storage to skip the page loader on subsequent internal page navigation within the same browsing session.
-          </p>
-          <p>
-            <strong>Why:</strong> The animated loader is only meant to show once. Using session storage avoids replaying it every time you click a link within the site.
-          </p>
-          <p>
-            <strong>Your choice:</strong> This is necessary for the site to feel responsive and is always enabled.
-          </p>
-
-          <div class="section-head" style="margin-top: 2rem;">
-            <h2 class="section-title">Your Preference</h2>
-          </div>
-
-          <p>I respect your choice. Below, you can view and change your cookie consent settings:</p>
-
-          <div class="cookie-preferences-box">
-            <div class="preferences-buttons">
-              <button id="cookie-accept-btn" class="cookie-btn cookie-btn-accept">Accept Location Lookup</button>
-              <button id="cookie-reject-btn" class="cookie-btn cookie-btn-reject">Reject Location Lookup</button>
-            </div>
-            <p id="cookie-status" class="cookie-status-message"></p>
-          </div>
-
-          <p class="cookie-policy-note">
-            Your choice is stored locally in your browser and never leaves your device. You can change it anytime by returning to this page.
-          </p>
-
-          <div class="section-head" style="margin-top: 2rem;">
-            <h2 class="section-title">Questions?</h2>
-          </div>
-
-          <p>
-            If you have questions about privacy or how this site works, feel free to <a href="/contact">get in touch</a>. I'm transparent about what I collect and why.
-          </p>
+      <div class="cookie-policy-content">
+        <section aria-labelledby="what-heading">
+          <h2 class="section-label" id="what-heading">What this site uses</h2>
+          <p>This site does not use advertising cookies, tracking pixels, or third-party analytics. The only data sent to third parties is your IP address, used to show your local time and to choose a matching background animation for your current weather.</p>
         </section>
-      </main>
 
-      <footer>
-        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved.</p>
-      </footer>
+        <section aria-labelledby="ip-heading" style="margin-top:2.5rem;">
+          <h2 class="section-label" id="ip-heading">IP address lookup</h2>
+          <p>Your IP address is sent to one of these services to detect your approximate location, timezone, and coordinates:</p>
+          <ul>
+            <li><strong>ipwho.is</strong> &mdash; <a href="https://ipwho.is" target="_blank" rel="noopener">ipwho.is</a></li>
+            <li><strong>ipinfo.io</strong> &mdash; <a href="https://ipinfo.io" target="_blank" rel="noopener">ipinfo.io</a></li>
+          </ul>
+          <p>The returned coordinates (latitude and longitude) are then used for a weather lookup (see below). <strong>No data is stored by this site.</strong> Your IP is sent directly to these third-party services and is not logged or retained by gekkzzz.co.uk.</p>
+          <p>This lookup happens regardless of your cookie preference, as it is necessary for core site features (local time display and weather animation). No personal data is stored as a result.</p>
+        </section>
+
+        <section aria-labelledby="weather-heading" style="margin-top:2.5rem;">
+          <h2 class="section-label" id="weather-heading">Weather lookup</h2>
+          <p>Once your approximate coordinates are known from the IP lookup, the site fetches current weather conditions from:</p>
+          <ul>
+            <li><strong>Open-Meteo</strong> &mdash; <a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a> &mdash; a free, open-source weather API</li>
+          </ul>
+          <p>Only your latitude and longitude are sent. No IP address, name, or other personal data is included in this request. The weather code returned (e.g. "rain", "snow", "clear") is used solely to select a background animation that matches your local conditions. Open-Meteo requires no account and stores no personal data.</p>
+        </section>
+
+        <section aria-labelledby="storage-heading" style="margin-top:2.5rem;">
+          <h2 class="section-label" id="storage-heading">Local storage</h2>
+          <p>This site stores the following items in your browser's <code>localStorage</code>:</p>
+          <ul>
+            <li><code>gekkzzz-cookie-consent</code> &mdash; your accept/reject preference for this notice</li>
+            <li><code>gekkzzz-theme</code> &mdash; your chosen colour theme (dark, light, or auto)</li>
+            <li><code>gekkzzz-anim-enabled</code> &mdash; whether the background animation is on or off</li>
+          </ul>
+          <p>These are stored locally in your browser only and are never transmitted to any server.</p>
+        </section>
+
+        <section aria-labelledby="preference-heading" style="margin-top:2.5rem;">
+          <h2 class="section-label" id="preference-heading">Your preference</h2>
+          <div class="cookie-preference-box">
+            <p class="cookie-preference-label">Current consent setting:</p>
+            <p class="cookie-preference-status" id="consent-status">Loading&hellip;</p>
+            <div class="cookie-banner-actions">
+              <button class="cookie-btn cookie-btn-accept" id="cookie-accept" type="button">Accept</button>
+              <button class="cookie-btn cookie-btn-reject" id="cookie-reject" type="button">Reject</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies" aria-current="page">Cookie Policy</a></p>
+    </footer>
+  </div>
+
+  <!-- Cookie banner -->
+  <div class="cookie-banner" id="cookie-banner" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-describedby="cookie-banner-desc">
+    <p id="cookie-banner-desc">
+      This site uses your IP address to show your local time and location. No data is stored by this site.
+      <a href="/cookies" aria-current="page">Cookie Policy</a>
+    </p>
+    <div class="cookie-banner-actions">
+      <button class="cookie-btn cookie-btn-accept" id="cookie-accept-banner" type="button">Accept</button>
+      <button class="cookie-btn cookie-btn-reject" id="cookie-reject-banner" type="button">Reject</button>
     </div>
   </div>
 
   <script src="../assets/js/site.js"></script>
-
+  <script src="../assets/js/animations.js"></script>
   <script>
-    function updateCookieStatus() {
-      const statusEl = document.getElementById('cookie-status');
-      if (!statusEl) return;
+    (function () {
+      var CONSENT_KEY = 'gekkzzz-cookie-consent';
+      var banner = document.getElementById('cookie-banner');
+      var acceptBannerBtn = document.getElementById('cookie-accept-banner');
+      var rejectBannerBtn = document.getElementById('cookie-reject-banner');
+      function getConsent() { try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; } }
+      function setConsentBanner(value) { try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {} if (banner) banner.classList.remove('is-visible'); }
+      if (!getConsent()) { setTimeout(function () { if (banner) banner.classList.add('is-visible'); }, 800); }
+      if (acceptBannerBtn) acceptBannerBtn.addEventListener('click', function () { setConsentBanner('accept'); });
+      if (rejectBannerBtn) rejectBannerBtn.addEventListener('click', function () { setConsentBanner('reject'); });
+    })();
+  </script>
+  <script>
+    (function () {
+      const CONSENT_KEY = 'gekkzzz-cookie-consent';
+      const statusEl = document.getElementById('consent-status');
+      const acceptBtn = document.getElementById('cookie-accept');
+      const rejectBtn = document.getElementById('cookie-reject');
 
-      const consent = window.siteGetCookieConsent ? window.siteGetCookieConsent() : null;
-
-      if (consent === 'accept') {
-        statusEl.textContent = 'You have accepted location lookup. The site will enrich your timezone display.';
-        statusEl.style.color = 'var(--status-color)';
-      } else if (consent === 'reject') {
-        statusEl.textContent = 'You have rejected location lookup. Your time will be based on your computer\'s timezone only.';
-        statusEl.style.color = 'var(--meta-color)';
-      } else {
-        statusEl.textContent = 'No preference set. The consent banner will appear on the home page.';
-        statusEl.style.color = 'var(--meta-color)';
+      function getConsent() {
+        try { return localStorage.getItem(CONSENT_KEY); } catch { return null; }
       }
-    }
 
-    const acceptBtn = document.getElementById('cookie-accept-btn');
-    const rejectBtn = document.getElementById('cookie-reject-btn');
+      function setConsent(value) {
+        try { localStorage.setItem(CONSENT_KEY, value); } catch {}
+        updateStatus();
+      }
 
-    if (acceptBtn) {
-      acceptBtn.addEventListener('click', () => {
-        if (window.siteSetCookieConsent) window.siteSetCookieConsent('accept');
-        updateCookieStatus();
-      });
-    }
+      function updateStatus() {
+        const val = getConsent();
+        if (statusEl) {
+          statusEl.textContent = val === 'accept' ? 'Accepted' : val === 'reject' ? 'Rejected' : 'Not set';
+        }
+      }
 
-    if (rejectBtn) {
-      rejectBtn.addEventListener('click', () => {
-        if (window.siteSetCookieConsent) window.siteSetCookieConsent('reject');
-        updateCookieStatus();
-      });
-    }
-
-    updateCookieStatus();
+      updateStatus();
+      if (acceptBtn) acceptBtn.addEventListener('click', function () { setConsent('accept'); });
+      if (rejectBtn) rejectBtn.addEventListener('click', function () { setConsent('reject'); });
+    })();
   </script>
 </body>
 </html>

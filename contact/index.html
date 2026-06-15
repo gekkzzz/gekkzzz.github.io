@@ -3,75 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact - gekkzzz</title>
-  <meta name="description" content="Get in touch with gekkzzz via LinkedIn, GitHub, Substack, or email.">
-  <link rel="icon" type="image/png" href="../assets/images/avatar.png">
+  <title>Contact gekkzzz — Web Developer | Liverpool, UK</title>
+  <meta name="description" content="Get in touch with gekkzzz — web developer and video essayist based in Liverpool, UK. Available for apprenticeship and freelance work. Email, GitHub, YouTube, and Substack.">
+  <link rel="canonical" href="https://gekkzzz.co.uk/contact/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gekkzzz.co.uk/contact/">
+  <meta property="og:title" content="Contact gekkzzz — Web Developer">
+  <meta property="og:description" content="Available for apprenticeship and freelance work. Reach out via email, GitHub, YouTube, or Substack.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Contact gekkzzz — Web Developer">
+  <meta name="twitter:description" content="Available for apprenticeship and freelance work. Reach out via email, GitHub, YouTube, or Substack.">
   <link rel="stylesheet" href="../assets/css/site.css">
+  <script>
+    (function () {
+      var pref = localStorage.getItem('gekkzzz-theme') || 'dark';
+      if (pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
-<body class="is-site-loading">
+<body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  <div class="page-loader" id="page-loader" aria-hidden="true">
-    <div class="loader-shell">
-      <p class="activity-update-note loader-note">Loading</p>
-      <div class="loader-slot">
-        <div class="loader" aria-hidden="true"></div>
-        <h2 class="section-title loader-done">DONE!</h2>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/">home</a>
+      <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">blog</a>
+      <a href="/contact" aria-current="page">contact</a>
+      <div class="theme-toggle" role="group" aria-label="Theme preference">
+        <button class="theme-btn" data-theme="dark" type="button" title="Dark mode">dark</button>
+        <button class="theme-btn" data-theme="light" type="button" title="Light mode">light</button>
+        <button class="theme-btn" data-theme="system" type="button" title="Follow system setting">auto</button>
+        <button class="theme-btn" id="anim-toggle-btn" type="button" title="Toggle background animation">anim: on</button>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <div class="page-wrap">
-    <a class="corner-avatar-link" href="/secret" title="ooo, a secret!" aria-label="Open the secret Pong page">
-      <img class="corner-avatar" src="../assets/images/avatar.png" alt="Avatar">
-    </a>
-
-    <div class="container">
+    <main id="main-content">
       <header class="hero">
-        <div>
-          <h1 class="site-title">gekkzzz</h1>
-          <div class="available-badge">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="available-text">Available For Work</span>
-          </div>
-          <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
-        </div>
-
-        <nav class="hero-links" aria-label="Main navigation">
-          <a href="/">Home</a>
-          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
-          <a href="/about">About</a>
-          <a href="/work">My Work</a>
-          <a href="/resources">Resources</a>
-          <a href="/contact" aria-current="page">Contact</a>
-        </nav>
+        <h1 class="hero-name">Contact</h1>
+        <p class="hero-bio">I'm looking for apprenticeship opportunities and open to freelance work, collaborations, or just a chat. Pick whichever channel suits you.</p>
       </header>
 
-      <main id="main-content">
-        <section class="posts">
-          <div class="section-head">
-            <h2 class="section-title">Contact</h2>
-          </div>
+      <section aria-labelledby="contact-heading">
+        <h2 class="section-label" id="contact-heading">Get in touch</h2>
+        <ul class="post-list">
+          <li>
+            <a href="https://github.com/gekkzzz" target="_blank" rel="noopener">GitHub</a>
+            <span class="post-date">github.com/gekkzzz &mdash; code, projects, and contributions</span>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/@gekkzzz" target="_blank" rel="noopener">YouTube</a>
+            <span class="post-date">youtube.com/@gekkzzz &mdash; video essays</span>
+          </li>
+          <li>
+            <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Substack</a>
+            <span class="post-date">gekkzzz.substack.com &mdash; blog and written essays</span>
+          </li>
+          <li>
+            <a href="mailto:contact@gekkzzz.co.uk">Email</a>
+            <span class="post-date">contact@gekkzzz.co.uk &mdash; best for project enquiries</span>
+          </li>
+        </ul>
+      </section>
+    </main>
 
-          <p>If you'd like to get in touch, reach out through one of the channels below.</p>
+    <footer>
+      <p>&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
+    </footer>
+  </div>
 
-          <ul class="contact-list">
-            <li><span class="contact-prefix">LINKEDIN</span><a href="https://www.linkedin.com/in/gekkzzz" target="_blank" rel="noopener">www.linkedin.com/in/gekkzzz</a></li>
-            <li><span class="contact-prefix">MY WORK</span><a href="https://github.com/gekkzzz" target="_blank" rel="noopener">github.com/gekkzzz</a></li>
-            <li><span class="contact-prefix">MY BLOG</span><a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">gekkzzz.substack.com</a></li>
-            <li><span class="contact-prefix">EMAIL ME</span><a href="mailto:contact@gekkzzz.co.uk">contact@gekkzzz.co.uk</a></li>
-          </ul>
-
-          <p>Open to freelance work, collaborations, and cool internet projects.</p>
-
-          <p class="activity-update-note">Note: if you email me and don't hear back, check your spam folder — my replies sometimes end up there.</p>
-        </section>
-      </main>
-
-      <footer>
-        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
-      </footer>
+  <!-- Cookie banner -->
+  <div class="cookie-banner" id="cookie-banner" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-describedby="cookie-banner-desc">
+    <p id="cookie-banner-desc">
+      This site uses your IP address to show your local time and location. No data is stored by this site.
+      <a href="/cookies">Cookie Policy</a>
+    </p>
+    <div class="cookie-banner-actions">
+      <button class="cookie-btn cookie-btn-accept" id="cookie-accept" type="button">Accept</button>
+      <button class="cookie-btn cookie-btn-reject" id="cookie-reject" type="button">Reject</button>
     </div>
   </div>
+
   <script src="../assets/js/site.js"></script>
+  <script src="../assets/js/animations.js"></script>
+  <script>
+    (function () {
+      var CONSENT_KEY = 'gekkzzz-cookie-consent';
+      var banner = document.getElementById('cookie-banner');
+      var acceptBtn = document.getElementById('cookie-accept');
+      var rejectBtn = document.getElementById('cookie-reject');
+      function getConsent() { try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; } }
+      function setConsent(value) { try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {} if (banner) banner.classList.remove('is-visible'); }
+      if (!getConsent()) { setTimeout(function () { if (banner) banner.classList.add('is-visible'); }, 800); }
+      if (acceptBtn) acceptBtn.addEventListener('click', function () { setConsent('accept'); });
+      if (rejectBtn) rejectBtn.addEventListener('click', function () { setConsent('reject'); });
+    })();
+  </script>
 </body>
 </html>

@@ -3,114 +3,295 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>gekkzzz - web developer, video essayist, nerd</title>
-  <meta name="description" content="gekkzzz — web developer, video essayist, and nerd based in Liverpool. Portfolio, blog, and live time clock.">
-  <link rel="icon" type="image/png" href="assets/images/avatar.png">
+  <title>gekkzzz — Web Developer &amp; Video Essayist | Liverpool, UK</title>
+  <meta name="description" content="Portfolio of gekkzzz — web developer and video essayist based in Liverpool, UK. Available for apprenticeship and freelance work. Projects, blog, and contact.">
+  <link rel="canonical" href="https://gekkzzz.co.uk/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gekkzzz.co.uk/">
+  <meta property="og:title" content="gekkzzz — Web Developer & Video Essayist">
+  <meta property="og:description" content="Web developer and video essayist based in Liverpool, UK. Available for apprenticeship and freelance work.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="gekkzzz — Web Developer & Video Essayist">
+  <meta name="twitter:description" content="Web developer and video essayist based in Liverpool, UK. Available for apprenticeship and freelance work.">
   <link rel="stylesheet" href="assets/css/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://gekkzzz.co.uk/#person",
+        "name": "gekkzzz",
+        "url": "https://gekkzzz.co.uk/",
+        "jobTitle": "Web Developer",
+        "description": "Web developer and video essayist based in Liverpool, UK.",
+        "address": { "@type": "PostalAddress", "addressLocality": "Liverpool", "addressCountry": "GB" },
+        "sameAs": [
+          "https://github.com/gekkzzz",
+          "https://www.youtube.com/@gekkzzz",
+          "https://gekkzzz.substack.com"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://gekkzzz.co.uk/#website",
+        "url": "https://gekkzzz.co.uk/",
+        "name": "gekkzzz",
+        "description": "Portfolio and blog hub for gekkzzz — web developer and video essayist based in Liverpool, UK.",
+        "author": { "@id": "https://gekkzzz.co.uk/#person" }
+      }
+    ]
+  }
+  </script>
+  <script>
+    (function () {
+      var pref = localStorage.getItem('gekkzzz-theme') || 'dark';
+      if (pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
-<body class="is-site-loading">
+<body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  <div class="page-loader" id="page-loader" aria-hidden="true">
-    <div class="loader-shell">
-      <p class="activity-update-note loader-note">Loading</p>
-      <div class="loader-slot">
-        <div class="loader" aria-hidden="true"></div>
-        <h2 class="section-title loader-done">DONE!</h2>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/" aria-current="page">home</a>
+      <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">blog</a>
+      <a href="/contact">contact</a>
+      <div class="theme-toggle" role="group" aria-label="Theme preference">
+        <button class="theme-btn" data-theme="dark" type="button" title="Dark mode">dark</button>
+        <button class="theme-btn" data-theme="light" type="button" title="Light mode">light</button>
+        <button class="theme-btn" data-theme="system" type="button" title="Follow system setting">auto</button>
+        <button class="theme-btn" id="anim-toggle-btn" type="button" title="Toggle background animation">anim: on</button>
       </div>
-    </div>
-  </div>
+    </nav>
 
-  <div class="page-wrap">
-    <a class="corner-avatar-link" href="/secret" title="ooo, a secret!" aria-label="Open the secret Pong page">
-      <img class="corner-avatar" src="assets/images/avatar.png" alt="Avatar">
-    </a>
-
-    <div class="container">
+    <main id="main-content">
       <header class="hero">
-        <div>
-          <h1 class="site-title">gekkzzz</h1>
-          <div class="available-badge">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="available-text">Available For Work</span>
-          </div>
-          <p class="eyebrow">Web Developer, Video Essayist, Nerd</p>
-          <div class="hero-actions">
-            <a class="primary-link-button" href="assets/docs/CV.pdf" target="_blank" rel="noopener noreferrer" type="application/pdf" title="Open CV PDF in a new window for viewing">
-              View CV (PDF)
-            </a>
-          </div>
+        <h1 class="hero-name">gekkzzz</h1>
+        <p class="hero-tagline">Web Developer &middot; Video Essayist &middot; Nerd</p>
+        <div class="available-badge">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="available-text">Available For Work</span>
         </div>
-
-        <nav class="hero-links" aria-label="Main navigation">
-          <a href="/" aria-current="page">Home</a>
+        <p class="hero-bio">
+          Based in Liverpool, GB. I build things for the web, make video essays, and spend too much time
+          configuring my tools. Currently looking for apprenticeship and freelance opportunities.
+        </p>
+        <div class="hero-cta">
+          <a href="assets/docs/cv-1.pdf" target="_blank" rel="noopener noreferrer">View CV</a>
+          <a href="https://github.com/gekkzzz" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.youtube.com/@gekkzzz" target="_blank" rel="noopener">YouTube</a>
           <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">Blog</a>
-          <a href="/about">About</a>
-          <a href="/work">My Work</a>
-          <a href="/resources">Resources</a>
-          <a href="/contact">Contact</a>
-        </nav>
+          <a href="/contact">Get in touch</a>
+        </div>
       </header>
 
-      <main id="main-content">
-        <section class="time-section">
-          <div class="time-grid">
-            <article class="time-card">
-              <p class="time-label">My Time (Liverpool, GB)</p>
-              <p class="time-value" id="my-time">--:--:--</p>
-              <p class="time-meta" id="my-timezone">Europe/London · base time</p>
-            </article>
-            <article class="time-card">
-              <p class="time-label" id="your-time-label">Your time</p>
-              <p class="time-value" id="your-time">--:--:--</p>
-              <p class="time-meta" id="your-timezone">Using your browser timezone&hellip;</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="contributions">
-          <div class="section-head">
-            <h2 class="section-title">Activity</h2>
-            <a class="section-link" href="https://github.com/gekkzzz" target="_blank" rel="noopener">View GitHub</a>
-          </div>
-          <p class="activity-update-note">(activity calendar updated every hour)</p>
-          <div id="github-calendar" class="activity-shell contribution-frame" aria-live="polite" aria-label="GitHub activity calendar">Loading activity&hellip;</div>
-        </section>
-
-        <section class="posts">
-          <div class="section-head">
-            <h2 class="section-title">Latest Blog Posts</h2>
-          </div>
-          <ul class="post-list" id="post-list" aria-live="polite" aria-label="Latest blog posts">
-            <li class="post-empty">Loading&hellip;</li>
-          </ul>
-        </section>
-      </main>
-
-      <footer>
-        <div class="resources-grid">
-          <article>
-            <p class="resources-heading">Causes</p>
-            <ul class="resources-list">
-              <li><a href="https://www.totalgiving.co.uk/charity-directory" target="_blank" rel="noopener">Charity Directory UK</a></li>
-              <li><a href="https://wearethechange.carrd.co" target="_blank" rel="noopener">We Are The Change</a></li>
-              <li><a href="https://www.un.org/en/global-issues" target="_blank" rel="noopener">UN Global Issues</a></li>
-            </ul>
+      <section aria-labelledby="time-heading">
+        <h2 class="section-label" id="time-heading">Time</h2>
+        <div class="time-grid">
+          <article class="time-card">
+            <p class="time-label">My time (Liverpool, GB)</p>
+            <p class="time-value" id="my-time">--:--:--</p>
+            <p class="time-meta" id="my-timezone">Europe/London &middot; local time</p>
           </article>
-
-          <article>
-            <p class="resources-heading">Cool Stuff</p>
-            <ul class="resources-list">
-              <li><a href="https://stats.foldingathome.org" target="_blank" rel="noopener">Folding@Home</a></li>
-              <li><a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener">freeCodeCamp</a></li>
-              <li><a href="https://learn-anything.xyz" target="_blank" rel="noopener">Learn Anything</a></li>
-            </ul>
+          <article class="time-card">
+            <p class="time-label" id="your-time-label">Your time</p>
+            <p class="time-value" id="your-time">--:--:--</p>
+            <p class="time-meta" id="your-timezone">Detecting&hellip;</p>
           </article>
         </div>
+      </section>
 
-        <p class="footer-legal">&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
-      </footer>
+      <section aria-labelledby="activity-heading">
+        <h2 class="section-label" id="activity-heading">
+          GitHub Activity
+          <span style="font-weight:400;">(updated every hour)</span>
+        </h2>
+        <div id="github-calendar" aria-live="polite" aria-label="GitHub activity calendar">Loading activity&hellip;</div>
+      </section>
+
+      <section aria-labelledby="projects-heading">
+        <h2 class="section-label" id="projects-heading">
+          Projects
+          <a href="https://github.com/gekkzzz" target="_blank" rel="noopener">View GitHub &rarr;</a>
+        </h2>
+        <ul class="project-list">
+
+          <li class="project-card" data-github-repo="gekkzzz/Glyndwr">
+            <a class="project-card-title" href="https://github.com/gekkzzz/Glyndwr" target="_blank" rel="noopener">Glyndwr</a>
+            <p class="project-card-desc">Self-hosted AI workspace &mdash; chat, notes, tasks, calendar, and autonomous agent support. No telemetry, no lock-in.</p>
+            <div class="lang-bar" aria-hidden="true">
+              <div class="lang-bar-seg" style="width:38%;background:#f1e05a;"></div>
+              <div class="lang-bar-seg" style="width:24%;background:#3572A5;"></div>
+              <div class="lang-bar-seg" style="width:19.6%;background:#563d7c;"></div>
+              <div class="lang-bar-seg" style="width:17%;background:#e34c26;"></div>
+            </div>
+            <ul class="lang-list" aria-label="Languages">
+              <li class="lang-item"><span class="lang-dot" style="background:#f1e05a;"></span><span class="lang-name">JavaScript</span><span class="lang-pct">38%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#3572A5;"></span><span class="lang-name">Python</span><span class="lang-pct">24%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#563d7c;"></span><span class="lang-name">CSS</span><span class="lang-pct">19.6%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#e34c26;"></span><span class="lang-name">HTML</span><span class="lang-pct">17%</span></li>
+            </ul>
+          </li>
+
+          <li class="project-card" data-github-repo="gekkzzz/Study-Sprint-Tracker">
+            <a class="project-card-title" href="https://github.com/gekkzzz/Study-Sprint-Tracker" target="_blank" rel="noopener">Study Sprint Tracker</a>
+            <p class="project-card-desc">GitHub Action that automatically tracks learning progress by appending dated journal entries on push &mdash; no external tools needed.</p>
+            <div class="lang-bar" aria-hidden="true">
+              <div class="lang-bar-seg" style="width:100%;background:#f1e05a;"></div>
+            </div>
+            <ul class="lang-list" aria-label="Languages">
+              <li class="lang-item"><span class="lang-dot" style="background:#f1e05a;"></span><span class="lang-name">JavaScript</span><span class="lang-pct">100%</span></li>
+            </ul>
+          </li>
+
+          <li class="project-card" data-github-repo="gekkzzz/Tape-N-Torque-Portfolio-Website">
+            <a class="project-card-title" href="https://tape-n-torque-portfolio-website.vercel.app/" target="_blank" rel="noopener">Tape &lsquo;N&rsquo; Torque</a>
+            <p class="project-card-desc">Portfolio website for a motorsport photography client.</p>
+            <div class="lang-bar" aria-hidden="true">
+              <div class="lang-bar-seg" style="width:60.4%;background:#563d7c;"></div>
+              <div class="lang-bar-seg" style="width:38.4%;background:#f1e05a;"></div>
+              <div class="lang-bar-seg" style="width:1.2%;background:#e34c26;"></div>
+            </div>
+            <ul class="lang-list" aria-label="Languages">
+              <li class="lang-item"><span class="lang-dot" style="background:#563d7c;"></span><span class="lang-name">CSS</span><span class="lang-pct">60.4%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#f1e05a;"></span><span class="lang-name">JavaScript</span><span class="lang-pct">38.4%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#e34c26;"></span><span class="lang-name">HTML</span><span class="lang-pct">1.2%</span></li>
+            </ul>
+          </li>
+
+          <li class="project-card" data-github-repo="gekkzzz/gekkzzz.github.io">
+            <a class="project-card-title" href="https://github.com/gekkzzz/gekkzzz.github.io" target="_blank" rel="noopener">gekkzzz.github.io</a>
+            <p class="project-card-desc">This site &mdash; personal portfolio and blog hub. Plain HTML, CSS, and vanilla JavaScript. No framework, no build step.</p>
+            <div class="lang-bar" aria-hidden="true">
+              <div class="lang-bar-seg" style="width:59%;background:#e34c26;"></div>
+              <div class="lang-bar-seg" style="width:24.9%;background:#f1e05a;"></div>
+              <div class="lang-bar-seg" style="width:16.1%;background:#563d7c;"></div>
+            </div>
+            <ul class="lang-list" aria-label="Languages">
+              <li class="lang-item"><span class="lang-dot" style="background:#e34c26;"></span><span class="lang-name">HTML</span><span class="lang-pct">59%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#f1e05a;"></span><span class="lang-name">JavaScript</span><span class="lang-pct">24.9%</span></li>
+              <li class="lang-item"><span class="lang-dot" style="background:#563d7c;"></span><span class="lang-name">CSS</span><span class="lang-pct">16.1%</span></li>
+            </ul>
+          </li>
+
+        </ul>
+      </section>
+
+      <section aria-labelledby="stack-heading">
+        <h2 class="section-label" id="stack-heading">Stack</h2>
+        <div class="stack-grid">
+          <div class="stack-group">
+            <p class="stack-group-label">Languages</p>
+            <ul class="stack-list">
+              <li class="stack-chip">TypeScript</li>
+              <li class="stack-chip">JavaScript</li>
+              <li class="stack-chip">Python</li>
+              <li class="stack-chip">HTML</li>
+              <li class="stack-chip">CSS</li>
+              <li class="stack-chip">SQL</li>
+              <li class="stack-chip">PHP</li>
+              <li class="stack-chip">R</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <p class="stack-group-label">Frameworks &amp; Runtime</p>
+            <ul class="stack-list">
+              <li class="stack-chip">React</li>
+              <li class="stack-chip">Next.js</li>
+              <li class="stack-chip">Vue.js</li>
+              <li class="stack-chip">Node.js</li>
+              <li class="stack-chip">TailwindCSS</li>
+              <li class="stack-chip">Supabase</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <p class="stack-group-label">Tools &amp; Platforms</p>
+            <ul class="stack-list">
+              <li class="stack-chip">Vite</li>
+              <li class="stack-chip">Vercel</li>
+              <li class="stack-chip">Git</li>
+              <li class="stack-chip">GitHub</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <p class="stack-group-label">Creative</p>
+            <ul class="stack-list">
+              <li class="stack-chip">Photoshop</li>
+              <li class="stack-chip">Illustrator</li>
+              <li class="stack-chip">Premiere Pro</li>
+              <li class="stack-chip">After Effects</li>
+              <li class="stack-chip">Lightroom</li>
+              <li class="stack-chip">Audition</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="blog-heading">
+        <h2 class="section-label" id="blog-heading">
+          Latest Posts
+          <a href="https://gekkzzz.substack.com" target="_blank" rel="noopener">All posts &rarr;</a>
+        </h2>
+        <ul class="post-list" id="post-list" aria-live="polite" aria-label="Latest blog posts">
+          <li class="post-empty">Loading&hellip;</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 gekkzzz. All rights reserved. &mdash; <a href="/cookies">Cookie Policy</a></p>
+    </footer>
+  </div>
+
+  <!-- Cookie banner -->
+  <div class="cookie-banner" id="cookie-banner" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-describedby="cookie-banner-desc">
+    <p id="cookie-banner-desc">
+      This site uses your IP address to show your local time and location. No data is stored by this site.
+      <a href="/cookies">Cookie Policy</a>
+    </p>
+    <div class="cookie-banner-actions">
+      <button class="cookie-btn cookie-btn-accept" id="cookie-accept" type="button">Accept</button>
+      <button class="cookie-btn cookie-btn-reject" id="cookie-reject" type="button">Reject</button>
     </div>
   </div>
+
   <script src="assets/js/site.js"></script>
+  <script src="assets/js/animations.js"></script>
+  <script>
+    (function () {
+      var CONSENT_KEY = 'gekkzzz-cookie-consent';
+      var banner = document.getElementById('cookie-banner');
+      var acceptBtn = document.getElementById('cookie-accept');
+      var rejectBtn = document.getElementById('cookie-reject');
+
+      function getConsent() {
+        try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+      }
+
+      function setConsent(value) {
+        try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {}
+        if (banner) banner.classList.remove('is-visible');
+      }
+
+      if (!getConsent()) {
+        setTimeout(function () {
+          if (banner) banner.classList.add('is-visible');
+        }, 800);
+      }
+
+      if (acceptBtn) {
+        acceptBtn.addEventListener('click', function () { setConsent('accept'); });
+      }
+      if (rejectBtn) {
+        rejectBtn.addEventListener('click', function () { setConsent('reject'); });
+      }
+    })();
+  </script>
 </body>
 </html>
