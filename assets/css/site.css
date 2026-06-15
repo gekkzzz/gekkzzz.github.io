@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
 
+/* ── Design tokens ────────────────────────────────────────────────────────────
+   CSS custom properties for the dark theme (default). Every colour in the
+   site references one of these variables so swapping themes is a one-liner. */
 :root {
   --bg-color: #121212;
   --text-color: #e0e0e0;
@@ -17,6 +20,7 @@
   --contrib-4: #7dcfff;
 }
 
+/* Light theme overrides — applied when JS sets data-theme="light" on <html> */
 html[data-theme="light"] {
   --bg-color: #f8f8f8;
   --text-color: #3a3a3a;
@@ -34,10 +38,14 @@ html[data-theme="light"] {
   --contrib-4: #1a6fc4;
 }
 
+/* ── Reset ────────────────────────────────────────────────────────────────────
+   Prevent padding and borders from expanding element widths. */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
+/* ── Accessibility ────────────────────────────────────────────────────────────
+   Skip link: hidden off-screen until focused via keyboard, then slides in. */
 .skip-link {
   position: absolute;
   top: -9999px;
@@ -55,6 +63,7 @@ html[data-theme="light"] {
   top: 0.5rem;
 }
 
+/* Visually hides an element while keeping it readable by screen readers. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -67,6 +76,7 @@ html[data-theme="light"] {
   border: 0;
 }
 
+/* Keyboard focus ring — only shown for keyboard navigation, not mouse clicks. */
 :focus-visible {
   outline: 2px solid var(--link-color);
   outline-offset: 3px;
@@ -79,6 +89,9 @@ html[data-theme="light"] {
   outline-offset: 2px;
 }
 
+/* ── Base typography ──────────────────────────────────────────────────────────
+   Monospace font stack gives the site its terminal / developer aesthetic.
+   Smooth transitions prevent a jarring colour flash when the theme changes. */
 html {
   font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
   color: var(--text-color);
@@ -94,6 +107,7 @@ body {
   padding: 0;
 }
 
+/* Dashed underline on links keeps them subtle but still visually distinct. */
 a {
   color: var(--link-color);
   text-decoration: none;
@@ -106,13 +120,17 @@ a:hover {
   border-bottom-color: var(--link-hover);
 }
 
+/* ── Layout container ─────────────────────────────────────────────────────────
+   Centred, max-width column with generous vertical breathing room. Sits above
+   the background canvas via z-index: 1 (see RAIN CANVAS section). */
 .container {
-  max-width: 700px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 5rem;
+  padding: 3rem 2rem 5rem;
 }
 
-/* NAV */
+/* ── NAV ──────────────────────────────────────────────────────────────────────
+   Horizontal nav bar. Links are muted until hovered or marked aria-current. */
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -135,7 +153,9 @@ a:hover {
   color: var(--heading-color);
 }
 
-/* THEME TOGGLE */
+/* ── THEME TOGGLE ─────────────────────────────────────────────────────────────
+   Group of small pill buttons pushed to the right of the nav via margin-left:auto.
+   The `.active` class highlights whichever theme is currently selected. */
 .theme-toggle {
   margin-left: auto;
   display: flex;
@@ -167,11 +187,13 @@ a:hover {
   background: color-mix(in srgb, var(--heading-color) 8%, transparent);
 }
 
-/* HERO */
+/* ── HERO ─────────────────────────────────────────────────────────────────────
+   Full-width intro block: large name, tagline, availability badge, bio, and CTA links. */
 .hero {
   margin-bottom: 5rem;
 }
 
+/* clamp() makes the name scale fluidly between mobile and desktop. */
 .hero-name {
   font-size: clamp(2.2rem, 9vw, 3.75rem);
   font-weight: 700;
@@ -188,6 +210,7 @@ a:hover {
   margin: 0 0 1.1rem;
 }
 
+/* Flex row that holds the pulsing dot and "Available For Work" text together. */
 .available-badge {
   display: inline-flex;
   align-items: center;
@@ -195,6 +218,7 @@ a:hover {
   margin-bottom: 1.1rem;
 }
 
+/* Green pulsing dot — the animation is paused by prefers-reduced-motion below. */
 .status-dot {
   display: inline-block;
   width: 8px;
@@ -206,12 +230,14 @@ a:hover {
   transform: translateY(-2px);
 }
 
+/* Expanding ring effect for the availability dot. */
 @keyframes pulse {
   0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-color) 70%, transparent); }
   70%  { box-shadow: 0 0 0 8px color-mix(in srgb, var(--status-color) 0%, transparent); }
   100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-color) 0%, transparent); }
 }
 
+/* Respect the OS "reduce motion" setting — stop all animations and theme transitions. */
 @media (prefers-reduced-motion: reduce) {
   .status-dot { animation: none; }
   html { transition: none; }
@@ -232,6 +258,7 @@ a:hover {
   max-width: 55ch;
 }
 
+/* Wrapping row of CTA links (CV, GitHub, YouTube, Blog, Contact). */
 .hero-cta {
   display: inline-flex;
   gap: 1rem;
@@ -242,7 +269,9 @@ a:hover {
   font-size: 0.82rem;
 }
 
-/* SECTIONS */
+/* ── SECTIONS ─────────────────────────────────────────────────────────────────
+   Each content block (Time, Activity, Projects…) is a <section> with a
+   consistent label style: small-caps heading with a bottom border. */
 section {
   margin-bottom: 4rem;
 }
@@ -261,6 +290,7 @@ section {
   justify-content: space-between;
 }
 
+/* Optional "View all" link rendered inline at the right of the section label. */
 .section-label a {
   font-size: 0.65rem;
   color: var(--meta-color);
@@ -272,7 +302,9 @@ section {
   color: var(--link-color);
 }
 
-/* TIME */
+/* ── TIME ─────────────────────────────────────────────────────────────────────
+   Two-column grid showing the developer's local time (Liverpool) and the
+   visitor's local time side by side. Collapses to one column on small screens. */
 .time-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -298,6 +330,7 @@ section {
   letter-spacing: 0.06em;
 }
 
+/* tabular-nums prevents the clock digits from shifting width as they change. */
 .time-value {
   font-size: 1.5rem;
   font-weight: 700;
@@ -313,12 +346,24 @@ section {
   margin: 0;
 }
 
-/* ACTIVITY */
+/* ── ACTIVITY ─────────────────────────────────────────────────────────────────
+   GitHub contribution calendar — a grid of small coloured cells.
+   Built dynamically by JS; these rules handle the layout and cell colours. */
 
+/* Card background wrapper matching the project card style. */
+#github-calendar {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  background: var(--card-bg);
+}
+
+/* Horizontal scroll wrapper so the calendar doesn't break on narrow screens. */
 .activity-calendar {
   overflow-x: auto;
 }
 
+/* Row that sits above the grid containing month label abbreviations. */
 .activity-month-row {
   display: flex;
   align-items: flex-end;
@@ -326,11 +371,13 @@ section {
   margin-bottom: 2px;
 }
 
+/* Empty block that aligns month labels with the grid (offsets the weekday column). */
 .activity-month-spacer {
   width: 28px;
   flex-shrink: 0;
 }
 
+/* CSS grid for month labels — column count set via --weeks custom property in JS. */
 .activity-months {
   display: grid;
   grid-template-columns: repeat(var(--weeks), 13px);
@@ -346,11 +393,13 @@ section {
   overflow: visible;
 }
 
+/* Row containing the weekday labels column and the main cell grid. */
 .activity-grid-row {
   display: flex;
   gap: 4px;
 }
 
+/* Mon–Sun labels down the left side of the calendar. */
 .activity-weekdays {
   display: grid;
   grid-template-rows: repeat(7, 13px);
@@ -366,6 +415,7 @@ section {
   text-align: right;
 }
 
+/* The cell grid itself — flows column-first so each week is a vertical column. */
 .activity-grid {
   display: grid;
   grid-template-columns: repeat(var(--weeks), 13px);
@@ -380,6 +430,7 @@ section {
   border-radius: 2px;
 }
 
+/* Five contribution levels: 0 = empty, 1–4 = increasing intensity. */
 .activity-level-0 { background: var(--contrib-empty); }
 .activity-level-1 { background: var(--contrib-1); }
 .activity-level-2 { background: var(--contrib-2); }
@@ -387,6 +438,7 @@ section {
 .activity-level-4 { background: var(--contrib-4); }
 .activity-cell-future { background: transparent; }
 
+/* Footer row below the grid: total count on the left, legend on the right. */
 .activity-footer-row {
   display: flex;
   gap: 4px;
@@ -408,6 +460,7 @@ section {
   margin: 0;
 }
 
+/* "Less ■ ■ ■ ■ ■ More" legend. */
 .activity-legend {
   display: flex;
   align-items: center;
@@ -425,7 +478,8 @@ section {
   border-radius: 2px;
 }
 
-/* BLOG POSTS */
+/* ── BLOG POSTS ───────────────────────────────────────────────────────────────
+   Vertical list of recent Substack posts fetched via RSS proxy in site.js. */
 .post-list {
   list-style: none;
   margin: 0;
@@ -457,12 +511,14 @@ section {
   color: var(--link-color);
 }
 
+/* Shown when the feed is empty or fails to load. */
 .post-empty {
   font-size: 0.85rem;
   color: var(--meta-color);
 }
 
-/* STACK */
+/* ── STACK ────────────────────────────────────────────────────────────────────
+   Auto-fit grid of technology groups, each containing a list of pill "chips". */
 .stack-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -486,6 +542,7 @@ section {
   gap: 0.4rem;
 }
 
+/* Individual technology tag. */
 .stack-chip {
   font-size: 0.7rem;
   padding: 0.2rem 0.55rem;
@@ -495,7 +552,9 @@ section {
   background: var(--card-bg);
 }
 
-/* PROJECT CARDS */
+/* ── PROJECT CARDS ────────────────────────────────────────────────────────────
+   Bordered cards with a language breakdown bar and legend fetched live from
+   the GitHub API (or fallen back to inline markup when the API is unavailable). */
 .project-list {
   list-style: none;
   margin: 0;
@@ -505,6 +564,7 @@ section {
   gap: 0.75rem;
 }
 
+/* Border subtly shifts toward the link colour on hover. */
 .project-card {
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -539,6 +599,7 @@ section {
   margin: 0;
 }
 
+/* Thin horizontal bar where each segment's width = that language's % of the repo. */
 .lang-bar {
   display: flex;
   height: 6px;
@@ -552,6 +613,7 @@ section {
   border-radius: 2px;
 }
 
+/* Inline legend below the bar: coloured dot + name + percentage. */
 .lang-list {
   display: flex;
   flex-wrap: wrap;
@@ -585,7 +647,10 @@ section {
   color: var(--meta-color);
 }
 
-/* RAIN CANVAS */
+/* ── RAIN CANVAS ──────────────────────────────────────────────────────────────
+   Full-viewport background canvas for the weather animation (animations.js).
+   pointer-events: none keeps it from blocking clicks on page content.
+   z-index: 0 keeps it behind .container (z-index: 1). */
 #bg-canvas {
   position: fixed;
   inset: 0;
@@ -600,7 +665,9 @@ section {
   z-index: 1;
 }
 
-/* COOKIE BANNER */
+/* ── COOKIE BANNER ────────────────────────────────────────────────────────────
+   Fixed bottom-centre consent dialog. Hidden by default (display:none) and
+   shown by adding .is-visible once JS determines no consent is stored. */
 .cookie-banner {
   position: fixed;
   bottom: 1.25rem;
@@ -640,6 +707,7 @@ section {
   flex-wrap: wrap;
 }
 
+/* Shared base for Accept / Reject buttons. */
 .cookie-btn {
   font-family: inherit;
   font-size: 0.75rem;
@@ -651,6 +719,7 @@ section {
   line-height: 1.5;
 }
 
+/* Accept: filled with the link colour to draw the eye first. */
 .cookie-btn-accept {
   background: var(--link-color);
   color: var(--bg-color);
@@ -663,6 +732,7 @@ section {
   border-color: var(--link-hover);
 }
 
+/* Reject: ghost style so it's visible but not as prominent. */
 .cookie-btn-reject {
   background: transparent;
   color: var(--meta-color);
@@ -673,7 +743,8 @@ section {
   border-color: var(--heading-color);
 }
 
-/* COOKIE POLICY PAGE */
+/* ── COOKIE POLICY PAGE ───────────────────────────────────────────────────────
+   Styles for the /cookies page prose and the interactive preference box. */
 .cookie-policy-content h2 {
   font-size: 0.82rem;
   color: var(--heading-color);
@@ -693,6 +764,7 @@ section {
   margin: 0.5rem 0;
 }
 
+/* Box on the cookies page that shows the visitor's current consent status. */
 .cookie-preference-box {
   margin-top: 1rem;
   padding: 1rem 1.25rem;
@@ -715,7 +787,8 @@ section {
   font-weight: 500;
 }
 
-/* FOOTER */
+/* ── FOOTER ───────────────────────────────────────────────────────────────────
+   Simple copyright line with a link to the cookie policy page. */
 footer {
   padding-top: 2rem;
   border-top: 1px solid var(--border-color);

@@ -1,5 +1,8 @@
 (function () {
   // ── Theme ──────────────────────────────────────────────────────────────────
+  // Reads/writes the user's theme preference from localStorage and applies it
+  // by toggling data-theme="light" on <html>. Runs immediately (before paint)
+  // to avoid a dark→light flash on page load.
   const THEME_KEY = 'gekkzzz-theme';
 
   function applyTheme(preference) {
@@ -9,7 +12,7 @@
     } else if (preference === 'dark') {
       root.removeAttribute('data-theme');
     } else {
-      // system
+      // "system" — mirror the OS colour scheme preference
       if (window.matchMedia('(prefers-color-scheme: light)').matches) {
         root.setAttribute('data-theme', 'light');
       } else {
@@ -26,6 +29,7 @@
     try { localStorage.setItem(THEME_KEY, preference); } catch {}
   }
 
+  // Highlight the active theme button in the nav toggle group.
   function updateThemeButtons(active) {
     document.querySelectorAll('.theme-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.theme === active);
@@ -39,6 +43,7 @@
     const saved = getSavedTheme();
     updateThemeButtons(saved);
 
+    // Wire up the dark / light / auto buttons in the nav.
     document.querySelectorAll('.theme-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const preference = btn.dataset.theme;
@@ -57,6 +62,7 @@
 
 (async function () {
   // ── DOM refs ───────────────────────────────────────────────────────────────
+  // Grab every dynamic element once so we don't query the DOM repeatedly.
   const list = document.getElementById('post-list');
   const calendar = document.getElementById('github-calendar');
   const myTimeElement = document.getElementById('my-time');
@@ -67,10 +73,10 @@
 
   // ── Constants ──────────────────────────────────────────────────────────────
   const ukTimezone = 'Europe/London';
-  const timeTickIntervalMs = 1000;
+  const timeTickIntervalMs = 1000;                      // clock updates every second
   const activityUsername = 'gekkzzz';
   const activityApiBase = 'https://github-contributions-api.jogruber.de/v4/';
-  const activityRefreshIntervalMs = 60 * 60 * 1000;
+  const activityRefreshIntervalMs = 60 * 60 * 1000;    // cache busted every hour
   const msPerDay = 24 * 60 * 60 * 1000;
   const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' });
   const accessibleDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -82,6 +88,8 @@
   let isRefreshingActivity = false;
 
   // ── Timezone aliases ───────────────────────────────────────────────────────
+  // Maps deprecated/regional IANA timezone names to their canonical equivalents.
+  // Some browsers or IP APIs return legacy names that Intl rejects.
   const timezoneAliases = {
     'africa/asmera': 'Africa/Asmara', 'africa/timbuktu': 'Africa/Bamako',
     'america/atka': 'America/Adak', 'america/buenos_aires': 'America/Argentina/Buenos_Aires',
@@ -132,6 +140,7 @@
     'w-su': 'Europe/Moscow'
   };
 
+  // Fallback for half-hour/quarter-hour UTC offsets that lack a region name.
   const offsetTimezoneFallbacks = {
     '+0330': 'Asia/Tehran', '+0430': 'Asia/Kabul', '+0530': 'Asia/Kolkata',
     '+0545': 'Asia/Kathmandu', '+0630': 'Asia/Yangon', '+0845': 'Australia/Eucla',
@@ -140,6 +149,10 @@
   };
 
   // ── Timezone helpers ───────────────────────────────────────────────────────
+  // Builds three lookup maps from the browser's supported timezone list:
+  //   byLower      → exact lowercase match
+  //   byCompact    → alphanumeric-only match (handles dashes, underscores, etc.)
+  //   byCityCompact→ city-part-only match (e.g. "london" → "Europe/London")
   let supportedTimezoneMaps = null;
 
   function buildSupportedTimezoneMaps() {
@@ -173,6 +186,7 @@
     return trimmed.replace(/\s+/g, '_');
   }
 
+  // Converts strings like "UTC+5:30" or "GMT-4" into a canonical IANA name.
   function parseUtcOffsetTimezone(rawTimezone) {
     if (typeof rawTimezone !== 'string') return null;
     const match = rawTimezone.match(/^(?:UTC|GMT)?([+-])(\d{1,2}):?(\d{2})?$/i);
@@ -184,6 +198,7 @@
     return offsetTimezoneFallbacks[key] || null;
   }
 
+  // Splits a freeform timezone string into candidate tokens for lookup.
   function getTimezoneTokens(timezone) {
     if (typeof timezone !== 'string') return [];
     const stripped = timezone
@@ -193,6 +208,8 @@
     return stripped.split(/[,;|/\s]+/).filter(Boolean);
   }
 
+  // Resolves any timezone string (alias, offset, city name, etc.) to a canonical
+  // IANA timezone the browser's Intl API will accept.
   function getCanonicalTimezone(timezone) {
     const tokens = getTimezoneTokens(timezone);
     for (const token of tokens) {
@@ -230,6 +247,7 @@
   userTimezone = getCanonicalTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
 
   // ── Time display ───────────────────────────────────────────────────────────
+  // Formats a Date as HH:MM:SS in the given timezone.
   function formatClockTime(date, timezone) {
     try {
       return new Intl.DateTimeFormat('en-GB', {
@@ -243,6 +261,7 @@
     }
   }
 
+  // Returns the UTC offset in minutes for a given timezone at a given moment.
   function getTimezoneOffsetMinutes(date, timezone) {
     try {
       const parts = new Intl.DateTimeFormat('en-CA', {
@@ -260,6 +279,7 @@
     } catch { return 0; }
   }
 
+  // Produces a human-readable difference string like "+2h 30m ahead of Liverpool".
   function formatTimeDifference(date, ref, comp) {
     const diff = getTimezoneOffsetMinutes(date, comp) - getTimezoneOffsetMinutes(date, ref);
     if (!Number.isFinite(diff) || diff === 0) return 'Same as Liverpool';
@@ -274,6 +294,8 @@
     return `${sign}${parts.join(' ')} ${dir}`;
   }
 
+  // Derives a readable city label from a timezone string when the IP API hasn't
+  // returned a city name yet (e.g. "America/New_York" → "New York").
   function getFallbackLocationLabel(timezone) {
     const canonical = getCanonicalTimezone(timezone);
     if (!canonical) return 'Local device';
@@ -281,6 +303,7 @@
     return (parts[parts.length - 1] || canonical).replace(/_/g, ' ');
   }
 
+  // Updates the timezone labels and offset description beneath each clock.
   function updateTimeMetadata() {
     const now = new Date();
     const locationBits = [userLocation?.city, userLocation?.countryCode || userLocation?.country].filter(Boolean);
@@ -294,6 +317,7 @@
     if (yourTimezoneElement) yourTimezoneElement.textContent = [userTimezone, differenceLabel].filter(Boolean).join(' · ');
   }
 
+  // Called every second — writes the current time to both clock elements.
   function renderTimeSection() {
     if (!myTimeElement && !yourTimeElement) return;
     const now = new Date();
@@ -302,6 +326,8 @@
     updateTimeMetadata();
   }
 
+  // Tries two IP geolocation APIs in sequence to get the visitor's timezone
+  // and city. Updates userTimezone/userLocation and re-renders immediately.
   async function detectUserTimeFromLocation() {
     const endpoints = [
       'https://ipwho.is/?fields=success,city,country,country_code,timezone',
@@ -326,6 +352,8 @@
     renderTimeSection();
   }
 
+  // Start the clock immediately, then improve the "Your time" card once the
+  // IP lookup resolves.
   if (myTimeElement || yourTimeElement) {
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
@@ -333,6 +361,7 @@
   }
 
   // ── Activity calendar ──────────────────────────────────────────────────────
+  // Safe HTML helpers — never insert untrusted strings directly into innerHTML.
   function escapeHtml(str) {
     const d = document.createElement('div');
     d.textContent = String(str);
@@ -358,6 +387,7 @@
     return next;
   }
 
+  // Returns 0 (Mon) … 6 (Sun) — calendar weeks start on Monday.
   function getMondayBasedDayIndex(date) { return (date.getUTCDay() + 6) % 7; }
 
   function clampLevel(level) {
@@ -365,18 +395,24 @@
     return Number.isFinite(n) ? Math.max(0, Math.min(4, n)) : 0;
   }
 
+  // Re-scales contribution counts relative to the local max so the intensity
+  // levels reflect this year's activity rather than the API's absolute buckets.
   function recomputeLevels(days) {
     const max = Math.max(0, ...days.map(d => d.count));
     if (max === 0) return days;
     return days.map(d => d.count === 0 ? { ...d, level: 0 } : { ...d, level: Math.ceil((d.count / max) * 4) });
   }
 
+  // Returns the calendar range: 1 Jan of the current year → today (UTC).
   function getActivityRange(today = new Date()) {
     const end = toUtcDate(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
     const start = toUtcDate(today.getUTCFullYear(), 0, 1);
     return { start, end };
   }
 
+  // Fetches contribution data from the third-party GitHub contributions API
+  // for every calendar year in the requested range. The `hourBucket` query
+  // param is a cheap cache-buster that changes once per hour.
   async function fetchActivityDays(username, start, end, hourBucket) {
     const years = Array.from(new Set([start.getUTCFullYear(), end.getUTCFullYear()]));
     const payloads = await Promise.all(years.map(async (year) => {
@@ -395,6 +431,7 @@
       });
     });
 
+    // Build a complete array of every day in the range, filling gaps with zeros.
     const days = [];
     for (let cursor = new Date(start); cursor <= end; cursor = addUtcDays(cursor, 1)) {
       const key = toIsoDate(cursor);
@@ -404,6 +441,7 @@
     return recomputeLevels(days);
   }
 
+  // Pads the date range to full Mon–Sun weeks, then groups days into weekly columns.
   function buildActivityMatrix(days, start, end) {
     const renderStart = addUtcDays(start, -getMondayBasedDayIndex(start));
     const renderEnd = addUtcDays(end, 6 - getMondayBasedDayIndex(end));
@@ -431,6 +469,7 @@
     return { weeks, renderStart };
   }
 
+  // Calculates which grid column each month label belongs to.
   function buildMonthLabels(start, end, renderStart) {
     const labels = [];
     for (
@@ -444,6 +483,7 @@
     return labels;
   }
 
+  // Writes the complete calendar HTML into the container element.
   function renderActivityCalendar(container, days, start, end) {
     const { weeks, renderStart } = buildActivityMatrix(days, start, end);
     const monthLabels = buildMonthLabels(start, end, renderStart);
@@ -499,6 +539,8 @@
     `;
   }
 
+  // Fetches fresh data and re-renders the calendar. A guard flag prevents
+  // overlapping requests if the hourly timer fires while a fetch is in flight.
   async function refreshActivityCalendar() {
     if (!calendar || isRefreshingActivity) return;
     isRefreshingActivity = true;
@@ -514,6 +556,7 @@
     }
   }
 
+  // Schedules the next refresh for the top of the next hour, then recurses.
   function scheduleActivityRefreshOnTheHour() {
     const now = new Date();
     const nextHour = new Date(now);
@@ -532,6 +575,11 @@
   }
 
   // ── Blog posts ─────────────────────────────────────────────────────────────
+  // Fetches the latest Substack posts via RSS. Because RSS feeds don't support
+  // CORS, the request goes through a chain of public proxy services — the first
+  // one that returns valid XML wins.
+
+  // Validates that a URL uses http(s) before rendering it as an href.
   function safeUrl(url) {
     try {
       const u = new URL(url);
@@ -564,14 +612,14 @@
     for (const proxyUrl of proxies) {
       try {
         const controller = new AbortController();
-        const tid = window.setTimeout(() => controller.abort(), 8000);
+        const tid = window.setTimeout(() => controller.abort(), 8000);  // 8s per proxy
         const res = await fetch(proxyUrl, { signal: controller.signal });
         window.clearTimeout(tid);
         if (!res.ok) continue;
         const text = await res.text();
         if (!text || text.length < 50) continue;
         const xml = new DOMParser().parseFromString(text, 'text/xml');
-        if (xml.querySelector('parsererror')) continue;
+        if (xml.querySelector('parseerror')) continue;
         const items = Array.from(xml.getElementsByTagName('item')).slice(0, 3);
         if (items.length === 0) continue;
         // Only return if at least one item has a title
@@ -581,6 +629,7 @@
     return null;
   }
 
+  // Renders up to 3 posts into #post-list, or a fallback message on failure.
   if (list) {
     (async () => {
       try {
@@ -606,8 +655,12 @@
   }
 })();
 
-// Live GitHub language percentages
+// ── Live GitHub language percentages ──────────────────────────────────────────
+// For each project card that has a data-github-repo attribute, fetches the
+// language breakdown from the GitHub API and replaces the fallback lang-bar
+// and lang-list markup with live data.
 (function () {
+  // GitHub's canonical language colours (subset of languages used in the projects).
   const LANG_COLORS = {
     JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572A5',
     CSS: '#563d7c', HTML: '#e34c26', SCSS: '#c6538c', Shell: '#89e051',
@@ -620,6 +673,8 @@
     return LANG_COLORS[name] || '#888888';
   }
 
+  // Converts the API's { Language: bytes } object into percentage segments
+  // and writes them into the card's .lang-bar and .lang-list elements.
   function renderLangBar(card, langs) {
     const total = Object.values(langs).reduce((a, b) => a + b, 0);
     if (total === 0) return;

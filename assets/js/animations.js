@@ -1,38 +1,45 @@
 (function () {
+  // Grab the full-viewport background canvas injected in index.html.
+  // If the canvas is missing (e.g. on the contact/cookies pages) bail immediately.
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  let animId = null;
-  let particles = [];
-  let W = 0, H = 0;
-  let currentAnim = null;
+  let animId = null;      // requestAnimationFrame handle — null when stopped
+  let particles = [];     // active particle objects for the current animation
+  let W = 0, H = 0;       // canvas dimensions, kept in sync with the window
+  let currentAnim = null; // name of the animation currently running
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   function rand(min, max) { return min + Math.random() * (max - min); }
   function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 
+  // Resize the canvas pixel buffer to fill the window.
   function resize() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
 
+  // Cancel the animation loop, clear the canvas, and drop all particles.
   function stop() {
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     ctx.clearRect(0, 0, W, H);
     particles = [];
   }
 
+  // Returns true when the dark theme is active (no data-theme attribute on <html>).
   function isDark() {
     return !document.documentElement.hasAttribute('data-theme');
   }
 
   // ── Rain ───────────────────────────────────────────────────────────────────
+  // Creates a single raindrop particle. `opts` controls speed, length, opacity,
+  // and angle so the same factory serves both light rain and the thunderstorm.
   function makeRainDrop(randomY, opts) {
     const speed = rand(opts.minSpeed, opts.maxSpeed);
     return {
       x: rand(0, W),
-      y: randomY ? rand(-H, H) : rand(-(opts.maxLen), 0),
+      y: randomY ? rand(-H, H) : rand(-(opts.maxLen), 0),  // randomY=true scatters drops across the screen on init
       speed,
       len: rand(opts.minLen, opts.maxLen),
       opacity: rand(opts.minOpacity, opts.maxOpacity),
@@ -41,6 +48,8 @@
     };
   }
 
+  // Generic rain loop. Each drop is a gradient line that fades from transparent
+  // at the top to opaque at the tip, giving a motion-blur feel.
   function animateRain(opts) {
     stop();
     resize();
@@ -69,6 +78,7 @@
         d.y += d.speed;
         d.x += dx;
 
+        // Recycle drops that have left the visible area.
         if (d.y > H + opts.maxLen || d.x < -50 || d.x > W + 50) {
           particles[i] = makeRainDrop(false, opts);
           if (opts.angle) particles[i].x = rand(0, W + H * Math.abs(Math.tan(opts.angle || 0)));
@@ -86,9 +96,9 @@
       y: randomY ? rand(-H, H) : rand(-20, 0),
       r: rand(1.5, 4.5),
       speed: rand(0.6, 2.2),
-      drift: rand(-0.4, 0.4),
+      drift: rand(-0.4, 0.4),       // gentle horizontal sway per frame
       opacity: rand(0.3, 0.8),
-      wobble: rand(0, Math.PI * 2),
+      wobble: rand(0, Math.PI * 2), // phase offset so flakes don't wobble in sync
       wobbleSpeed: rand(0.01, 0.04)
     };
   }
@@ -105,7 +115,7 @@
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.wobble += p.wobbleSpeed;
-        p.x += p.drift + Math.sin(p.wobble) * 0.4;
+        p.x += p.drift + Math.sin(p.wobble) * 0.4;  // sine wave gives a drifting path
         p.y += p.speed;
 
         ctx.beginPath();
@@ -121,6 +131,8 @@
   }
 
   // ── Clear / sunny — rising golden motes ────────────────────────────────────
+  // Small floating dots that drift upwards and pulse in opacity, evoking dust
+  // motes or heat shimmer on a sunny day.
   function makeMote(randomY) {
     return {
       x: rand(0, W),
@@ -147,7 +159,7 @@
         const p = particles[i];
         p.pulse += p.pulseSpeed;
         p.x += p.drift;
-        p.y -= p.speed;
+        p.y -= p.speed;  // rise upwards
         const op = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse));
 
         ctx.beginPath();
@@ -206,7 +218,7 @@
       h: Math.ceil(w * 0.62) + 4,
       speed: rand(0.1, 0.35),
       opacity: rand(0.10, 0.24),
-      offscreen: null
+      offscreen: null  // built lazily on first draw and rebuilt when theme changes
     };
   }
 
@@ -243,6 +255,7 @@
   }
 
   // ── Fog — horizontal wisps ─────────────────────────────────────────────────
+  // Large semi-transparent radial-gradient ellipses that drift slowly rightward.
   function makeFogWisp(randomX, slotY) {
     return {
       x: randomX ? rand(-600, W) : -rand(300, 700),
@@ -272,6 +285,7 @@
         const p = particles[i];
         p.x += p.speed;
 
+        // Radial gradient fades the wisp to transparent at its edges.
         const g = ctx.createRadialGradient(
           p.x + p.w / 2, p.y, 0,
           p.x + p.w / 2, p.y, p.w / 2
@@ -292,6 +306,8 @@
   }
 
   // ── Lightning bolt drawing ─────────────────────────────────────────────────
+  // Generates a jagged polyline from a point near the top of the screen to
+  // somewhere in the lower half, with an optional branch.
   function makeBolt(x, startY) {
     const segments = [];
     let cx = x, cy = startY;
@@ -307,6 +323,7 @@
     return { segments, opacity: 1, life: 1, hasBranch: Math.random() < 0.5 };
   }
 
+  // Draws a bolt with a wide glow pass and a thin bright core pass.
   function drawBolt(bolt) {
     if (bolt.opacity <= 0) return;
     const glow = isDark() ? '200,220,255' : '150,180,255';
@@ -330,7 +347,7 @@
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Branch
+    // Branch — an optional secondary bolt splitting off mid-way.
     if (bolt.hasBranch && segs.length > 3) {
       const branchFrom = randInt(1, segs.length - 2);
       ctx.beginPath();
@@ -354,6 +371,7 @@
   let nextFlashIn = rand(3000, 8000);
   let bolts = [];
 
+  // Creates a lightning strike: screen flash, bolt(s), optional double-flash.
   function triggerLightning(now) {
     lastFlashTime = now;
     nextFlashIn = rand(2500, 9000);
@@ -363,7 +381,7 @@
     for (let i = 0; i < boltCount; i++) {
       bolts.push(makeBolt(rand(W * 0.1, W * 0.9), rand(-20, H * 0.1)));
     }
-    // Double flash
+    // Double flash — a brief second flash 100ms after the first.
     if (Math.random() < 0.4) {
       setTimeout(function () { flashOpacity = rand(0.05, 0.15); }, 100);
       setTimeout(function () { flashOpacity = 0; }, 200);
@@ -380,7 +398,7 @@
     const rainOpts = {
       count: 200, minSpeed: 14, maxSpeed: 22,
       minLen: 18, maxLen: 35, minOpacity: 0.15, maxOpacity: 0.55,
-      minWidth: 0.5, maxWidth: 1.5, angle: 0.18
+      minWidth: 0.5, maxWidth: 1.5, angle: 0.18  // slight diagonal for stormy feel
     };
     for (let i = 0; i < rainOpts.count; i++) particles.push(makeRainDrop(true, rainOpts));
 
@@ -389,10 +407,10 @@
     function draw(now) {
       ctx.clearRect(0, 0, W, H);
 
-      // Trigger lightning
+      // Trigger lightning when the timer expires.
       if (now - lastFlashTime > nextFlashIn) triggerLightning(now);
 
-      // Flash overlay
+      // Flash overlay — exponential decay fades the screen-wide white flash.
       if (flashOpacity > 0) {
         ctx.fillStyle = `rgba(200,215,255,${flashOpacity})`;
         ctx.fillRect(0, 0, W, H);
@@ -400,14 +418,14 @@
         if (flashOpacity < 0.004) flashOpacity = 0;
       }
 
-      // Bolts
+      // Fade out and remove spent bolts.
       for (let i = bolts.length - 1; i >= 0; i--) {
         drawBolt(bolts[i]);
         bolts[i].opacity *= 0.75;
         if (bolts[i].opacity < 0.02) bolts.splice(i, 1);
       }
 
-      // Rain
+      // Heavy angled rain (reuses the rain particle system).
       const dx = Math.sin(rainOpts.angle) * 2;
       for (let i = 0; i < particles.length; i++) {
         const d = particles[i];
@@ -436,6 +454,8 @@
   }
 
   // ── WMO code → animation ──────────────────────────────────────────────────
+  // Maps World Meteorological Organization weather codes (from the Open-Meteo
+  // API) to one of the six animation names.
   function pickAnimation(code) {
     if (code === 0 || code === 1) return 'clear';
     if (code === 2 || code === 3) return 'cloudy';
@@ -449,6 +469,7 @@
     return 'clear';
   }
 
+  // Starts the named animation, skipping if it's already running.
   function runAnimation(name) {
     if (name === currentAnim) return;
     currentAnim = name;
@@ -469,6 +490,7 @@
   }
 
   // ── Weather fetch ──────────────────────────────────────────────────────────
+  // Fetches the current weather code for a lat/lon from Open-Meteo (free, no key).
   async function fetchWeather(lat, lon) {
     try {
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code&timezone=auto&forecast_days=1`;
@@ -479,6 +501,8 @@
     } catch { return null; }
   }
 
+  // Geolocates the visitor via IP APIs, fetches weather for their coordinates,
+  // picks the matching animation, and caches it to localStorage for 30 minutes.
   async function detectAndAnimate() {
     const endpoints = [
       'https://ipwho.is/?fields=success,latitude,longitude',
@@ -495,7 +519,7 @@
         } else if (data.loc) {
           [lat, lon] = data.loc.split(',').map(Number);
         }
-        if (!lat || !lon) continue;
+        if (lat == null || lon == null) continue;
 
         const code = await fetchWeather(lat, lon);
         if (code !== null) {
@@ -513,10 +537,10 @@
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
-  const ANIM_ENABLED_KEY = 'gekkzzz-anim-enabled';
-  const ANIM_LAST_KEY = 'gekkzzz-anim-last';
-  const ANIM_LAST_TS_KEY = 'gekkzzz-anim-last-ts';
-  const ANIM_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+  const ANIM_ENABLED_KEY  = 'gekkzzz-anim-enabled';
+  const ANIM_LAST_KEY     = 'gekkzzz-anim-last';
+  const ANIM_LAST_TS_KEY  = 'gekkzzz-anim-last-ts';
+  const ANIM_CACHE_TTL    = 30 * 60 * 1000; // reuse cached weather for 30 minutes
   let animEnabled = true;
 
   function loadAnimEnabled() {
@@ -548,6 +572,7 @@
     updateToggleBtn();
   }
 
+  // Keeps the "anim: on/off" nav button in sync with the current state.
   function updateToggleBtn() {
     const btn = document.getElementById('anim-toggle-btn');
     if (!btn) return;
@@ -555,23 +580,28 @@
     btn.classList.toggle('active', animEnabled);
   }
 
+  // Start disabled if the user has requested reduced motion at the OS level.
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (prefersReduced.matches) {
     // Still expose API but start disabled
     animEnabled = false;
   }
 
+  // Track OS setting changes at runtime so toggling "Reduce Motion" takes effect immediately.
   prefersReduced.addEventListener('change', function (e) {
     if (e.matches) disableAnimations();
     else if (loadAnimEnabled()) enableAnimations();
   });
 
+  // Restart the animation at the new size when the window is resized.
   window.addEventListener('resize', function () {
     if (!animEnabled) return;
     resize();
     if (currentAnim) { const a = currentAnim; currentAnim = null; runAnimation(a); }
   });
 
+  // When the theme toggles, invalidate cached offscreen cloud canvases so they
+  // rebuild with the correct colour, then restart the animation.
   new MutationObserver(function () {
     if (!animEnabled) return;
     // Invalidate cached offscreen cloud canvases so they rebuild with the new theme colour
@@ -579,7 +609,8 @@
     if (currentAnim) { const a = currentAnim; currentAnim = null; runAnimation(a); }
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  // Public API
+  // Public API — exposed on window so the nav toggle button (wired below) and
+  // any inline scripts can call animApi.enable(), .disable(), .toggle(), etc.
   window.animApi = {
     run: function (name) { if (animEnabled) runAnimation(name); },
     enable: enableAnimations,
@@ -589,13 +620,14 @@
     updateToggleBtn: updateToggleBtn
   };
 
-  // Boot
+  // Boot — decide which animation to start and whether to fetch fresh weather.
   resize();
   animEnabled = loadAnimEnabled() && !prefersReduced.matches;
   if (animEnabled) {
     let startAnim = 'clear';
     let cacheValid = false;
     try {
+      // Use the cached animation if it's less than 30 minutes old.
       const last = localStorage.getItem(ANIM_LAST_KEY);
       const ts = parseInt(localStorage.getItem(ANIM_LAST_TS_KEY) || '0', 10);
       if (last && Date.now() - ts < ANIM_CACHE_TTL) {
@@ -604,7 +636,7 @@
       }
     } catch {}
     runAnimation(startAnim);
-    if (!cacheValid) detectAndAnimate();
+    detectAndAnimate();  // always fetch real weather in the background; cache only picks the starting animation
   } else {
     canvas.style.display = 'none';
   }
