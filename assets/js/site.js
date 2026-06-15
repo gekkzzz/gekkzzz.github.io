@@ -87,6 +87,46 @@
   let userLocation = null;
   let isRefreshingActivity = false;
 
+  const myWeatherElement = document.getElementById('my-weather');
+  const yourWeatherElement = document.getElementById('your-weather');
+
+  // WMO weather interpretation codes → human-readable label
+  function wmoToLabel(code, isDay) {
+    if (code === 0) return isDay ? 'Sunny' : 'Clear';
+    if (code === 1) return isDay ? 'Mainly sunny' : 'Mainly clear';
+    if (code === 2) return 'Partly cloudy';
+    if (code === 3) return 'Overcast';
+    if (code === 45 || code === 48) return 'Foggy';
+    if (code >= 51 && code <= 55) return 'Drizzle';
+    if (code >= 56 && code <= 57) return 'Freezing drizzle';
+    if (code >= 61 && code <= 65) return 'Rain';
+    if (code >= 66 && code <= 67) return 'Freezing rain';
+    if (code >= 71 && code <= 77) return 'Snow';
+    if (code >= 80 && code <= 82) return 'Rain showers';
+    if (code >= 85 && code <= 86) return 'Snow showers';
+    if (code === 95) return 'Thunderstorm';
+    if (code === 96 || code === 99) return 'Thunderstorm with hail';
+    return 'Unknown';
+  }
+
+  async function fetchWeather(lat, lon) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=weather_code,is_day&forecast_days=1`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const code = data?.current?.weather_code;
+    const isDay = data?.current?.is_day === 1;
+    if (code == null) return null;
+    return wmoToLabel(code, isDay);
+  }
+
+  async function loadLiverpoolWeather() {
+    try {
+      const label = await fetchWeather(53.4084, -2.9916);
+      if (myWeatherElement && label) myWeatherElement.textContent = label;
+    } catch {}
+  }
+
   // ── Timezone aliases ───────────────────────────────────────────────────────
   // Maps deprecated/regional IANA timezone names to their canonical equivalents.
   // Some browsers or IP APIs return legacy names that Intl rejects.
@@ -330,7 +370,7 @@
   // and city. Updates userTimezone/userLocation and re-renders immediately.
   async function detectUserTimeFromLocation() {
     const endpoints = [
-      'https://ipwho.is/?fields=success,city,country,country_code,timezone',
+      'https://ipwho.is/?fields=success,city,country,country_code,timezone,latitude,longitude',
       'https://ipinfo.io/json'
     ];
     for (const endpoint of endpoints) {
@@ -344,9 +384,25 @@
         const city = payload.city || null;
         const countryCode = payload.country_code || (typeof payload.country === 'string' && payload.country.length === 2 ? payload.country : null);
         const country = payload.country_name || payload.country || null;
+
+        let lat = payload.latitude ?? null;
+        let lon = payload.longitude ?? null;
+        if ((lat == null || lon == null) && typeof payload.loc === 'string') {
+          const parts = payload.loc.split(',');
+          if (parts.length === 2) { lat = parseFloat(parts[0]); lon = parseFloat(parts[1]); }
+        }
+
         if (tz) userTimezone = tz;
         if (city || countryCode) userLocation = { city, countryCode, country };
-        if (tz || city || countryCode) { renderTimeSection(); break; }
+        if (tz || city || countryCode) {
+          renderTimeSection();
+          if (lat != null && lon != null && yourWeatherElement) {
+            fetchWeather(lat, lon).then(label => {
+              if (label && yourWeatherElement) yourWeatherElement.textContent = label;
+            }).catch(() => {});
+          }
+          break;
+        }
       } catch {}
     }
     renderTimeSection();
@@ -358,6 +414,7 @@
     renderTimeSection();
     window.setInterval(renderTimeSection, timeTickIntervalMs);
     Promise.resolve().then(() => detectUserTimeFromLocation()).catch(() => {});
+    Promise.resolve().then(() => loadLiverpoolWeather()).catch(() => {});
   }
 
   // ── Activity calendar ──────────────────────────────────────────────────────

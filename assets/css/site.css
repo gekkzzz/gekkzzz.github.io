@@ -346,6 +346,13 @@ section {
   margin: 0;
 }
 
+.time-weather {
+  font-size: 0.67rem;
+  color: var(--meta-color);
+  margin: 0.2rem 0 0;
+  min-height: 1em;
+}
+
 /* ── ACTIVITY ─────────────────────────────────────────────────────────────────
    GitHub contribution calendar — a grid of small coloured cells.
    Built dynamically by JS; these rules handle the layout and cell colours. */
