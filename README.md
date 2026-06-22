@@ -74,7 +74,7 @@ Plain HTML, CSS, and vanilla JavaScript — no framework, no build step, no pack
 ├── sitemap.xml
 └── assets/
     ├── css/site.css
-    ├── docs/cv-1.pdf
+    ├── docs/CV FINAL.pdf
     └── js/
         ├── site.js        — theme, clocks, GitHub calendar, blog feed, language bars
         └── animations.js  — weather detection + all canvas animations
